@@ -15,8 +15,33 @@ ARXIV_DIR = ROOT / "arxiv_papers"
 ARXIV_MIN_INTERVAL_SECONDS = 3.0
 _last_arxiv_request_at = 0.0
 
-MIN_EMBEDDED_IMAGE_SIDE = 100
-TABLE_CAPTION_RE = re.compile(r"\bTable\s+\d+", re.IGNORECASE)
+MIN_EMBEDDED_IMAGE_SIDE = 200
+MAX_IMAGES_CAP = 4
+CAPTION_MAX_GAP = 120  # points; how far below the image a caption line may sit
+CAPTION_SNIPPET_CHARS = 160
+
+FIGURE_CAPTION_RE = re.compile(r"^(?:figure|fig\.?)\s*\d+\s*[:.\-]?\s*", re.IGNORECASE)
+TABLE_CAPTION_RE = re.compile(r"\btable\s+\d+\s*[:.\-]?\s*(.{0,%d})" % CAPTION_SNIPPET_CHARS, re.IGNORECASE)
+
+# Priority 0 = kept first when trimming down to MAX_IMAGES_CAP.
+RESULT_KEYWORDS = (
+    "performance", "comparison", "results", "accuracy", "benchmark",
+    "sota", "state-of-the-art", "ablation", "evaluation", "score",
+)
+METHOD_KEYWORDS = (
+    "overview", "architecture", "framework", "proposed method",
+    "pipeline", "model structure", "proposed approach", "system design",
+)
+LABEL_PRIORITY = {"results": 0, "method": 1, "other": 2}
+
+
+def _classify_caption(caption: str) -> str:
+    folded = caption.lower()
+    if any(keyword in folded for keyword in RESULT_KEYWORDS):
+        return "results"
+    if any(keyword in folded for keyword in METHOD_KEYWORDS):
+        return "method"
+    return "other"
 
 
 def _arxiv_user_agent() -> str:
@@ -57,7 +82,93 @@ def _get_or_download_pdf(arxiv_url: str) -> tuple[str, Path]:
     return arxiv_id, output_path
 
 
-def download_figure(arxiv_url: str = "", max_images: int = 6, dpi: int = 150) -> dict[str, Any]:
+def _caption_below(page: Any, rect: Any) -> str | None:
+    best_text: str | None = None
+    best_gap = CAPTION_MAX_GAP
+    for block in page.get_text("blocks"):
+        x0, y0, x1, text = block[0], block[1], block[2], block[4]
+        text = (text or "").strip()
+        if not text or not FIGURE_CAPTION_RE.match(text):
+            continue
+        gap = y0 - rect.y1
+        overlap = min(x1, rect.x1) - max(x0, rect.x0)
+        if 0 <= gap <= best_gap and overlap > 0:
+            best_text = text.replace("\n", " ")
+            best_gap = gap
+    return best_text
+
+
+def _embedded_figure_candidates(doc: Any, page_index: int) -> list[dict[str, Any]]:
+    page = doc[page_index]
+    candidates: list[dict[str, Any]] = []
+    seen_xrefs: set[int] = set()
+    for image_info in page.get_images(full=True):
+        xref = image_info[0]
+        if xref in seen_xrefs:
+            continue
+        seen_xrefs.add(xref)
+        rects = page.get_image_rects(xref)
+        if not rects:
+            continue
+        rect = rects[0]
+        if rect.width < MIN_EMBEDDED_IMAGE_SIDE or rect.height < MIN_EMBEDDED_IMAGE_SIDE:
+            continue
+        caption = _caption_below(page, rect)
+        if not caption:
+            # No "Figure N: ..." caption nearby -> likely a decorative/logo
+            # image or a sub-tile of a composite figure, not a standalone result.
+            continue
+        candidates.append({
+            "kind": "embedded_figure",
+            "page": page_index + 1,
+            "xref": xref,
+            "caption": caption[:CAPTION_SNIPPET_CHARS],
+            "label": _classify_caption(caption),
+            "area": rect.width * rect.height,
+        })
+    return candidates
+
+
+def _table_page_candidates(doc: Any, page_index: int) -> list[dict[str, Any]]:
+    page = doc[page_index]
+    caption: str | None = None
+    for block in page.get_text("blocks"):
+        text = (block[4] or "").strip()
+        # Anchor to the start of a text block, like _caption_below does for
+        # figures — a bare substring search would also match inline
+        # references such as "(see table 3)" inside running prose.
+        if text and TABLE_CAPTION_RE.match(text):
+            caption = text.replace("\n", " ")
+            break
+    if not caption:
+        return []
+    # A rendered table page is quantitative data by construction — classify by
+    # caption keywords only for embedded figures, where it actually
+    # distinguishes an architecture diagram from a results plot. Doing the
+    # same here would mislabel e.g. "Table 3: Variations on the Transformer
+    # architecture" as `method` just because "architecture" appears in prose,
+    # even though the table itself is an ablation/results table.
+    label = "results"
+    return [{
+        "kind": "table_page",
+        "page": page_index + 1,
+        "caption": caption[:CAPTION_SNIPPET_CHARS],
+        "label": label,
+        "area": 0,
+    }]
+
+
+def _dedupe_by_caption(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    best_by_caption: dict[str, dict[str, Any]] = {}
+    for candidate in candidates:
+        key = candidate["caption"].lower()
+        current_best = best_by_caption.get(key)
+        if current_best is None or candidate["area"] > current_best["area"]:
+            best_by_caption[key] = candidate
+    return list(best_by_caption.values())
+
+
+def download_figure(arxiv_url: str = "", max_images: int = MAX_IMAGES_CAP, dpi: int = 150) -> dict[str, Any]:
     try:
         try:
             import fitz  # PyMuPDF
@@ -65,63 +176,48 @@ def download_figure(arxiv_url: str = "", max_images: int = 6, dpi: int = 150) ->
             raise RuntimeError("Install pymupdf first: pip install pymupdf") from exc
 
         arxiv_id, pdf_path = _get_or_download_pdf(arxiv_url)
-        max_images = max(1, min(int(max_images or 6), 20))
+        max_images = max(1, min(int(max_images or MAX_IMAGES_CAP), MAX_IMAGES_CAP))
         dpi = max(72, min(int(dpi or 150), 300))
         out_dir = ARXIV_DIR / arxiv_id / "figures"
         out_dir.mkdir(parents=True, exist_ok=True)
 
         doc = fitz.open(str(pdf_path))
-        items: list[dict[str, Any]] = []
+        page_count = len(doc)
 
-        # Pass 1: embedded raster images (charts/plots/diagrams as figures).
-        seen_xrefs: set[int] = set()
-        for page_index in range(len(doc)):
-            if len(items) >= max_images:
-                break
-            page = doc[page_index]
-            for image_info in page.get_images(full=True):
-                if len(items) >= max_images:
-                    break
-                xref = image_info[0]
-                if xref in seen_xrefs:
-                    continue
-                seen_xrefs.add(xref)
-                pixmap = fitz.Pixmap(doc, xref)
-                if pixmap.width < MIN_EMBEDDED_IMAGE_SIDE or pixmap.height < MIN_EMBEDDED_IMAGE_SIDE:
-                    continue
+        candidates: list[dict[str, Any]] = []
+        for page_index in range(page_count):
+            candidates.extend(_embedded_figure_candidates(doc, page_index))
+            candidates.extend(_table_page_candidates(doc, page_index))
+        candidates = _dedupe_by_caption(candidates)
+
+        # Results captions first, then method-overview captions, then anything
+        # else; stable sort keeps original page order within each bucket.
+        candidates.sort(key=lambda item: (LABEL_PRIORITY[item["label"]], item["page"]))
+        selected = candidates[:max_images]
+
+        items: list[dict[str, Any]] = []
+        for candidate in selected:
+            page = doc[candidate["page"] - 1]
+            if candidate["kind"] == "embedded_figure":
+                pixmap = fitz.Pixmap(doc, candidate["xref"])
                 if pixmap.n - pixmap.alpha >= 4:
                     pixmap = fitz.Pixmap(fitz.csRGB, pixmap)
-                out_path = out_dir / f"p{page_index + 1}_fig_xref{xref}.png"
-                pixmap.save(str(out_path))
-                items.append({
-                    "type": "embedded_figure",
-                    "page": page_index + 1,
-                    "image_path": str(out_path),
-                    "width": pixmap.width,
-                    "height": pixmap.height,
-                })
-
-        # Pass 2: full-page render for pages whose text mentions "Table N",
-        # since tables are usually vector/text drawings, not embedded images.
-        for page_index in range(len(doc)):
-            if len(items) >= max_images:
-                break
-            page = doc[page_index]
-            if not TABLE_CAPTION_RE.search(page.get_text()):
-                continue
-            matrix = fitz.Matrix(dpi / 72, dpi / 72)
-            pixmap = page.get_pixmap(matrix=matrix)
-            out_path = out_dir / f"p{page_index + 1}_table_page.png"
+                out_path = out_dir / f"p{candidate['page']}_fig_xref{candidate['xref']}.png"
+            else:
+                matrix = fitz.Matrix(dpi / 72, dpi / 72)
+                pixmap = page.get_pixmap(matrix=matrix)
+                out_path = out_dir / f"p{candidate['page']}_table_page.png"
             pixmap.save(str(out_path))
             items.append({
-                "type": "table_page",
-                "page": page_index + 1,
+                "type": candidate["kind"],
+                "label": candidate["label"],
+                "page": candidate["page"],
+                "caption": candidate["caption"],
                 "image_path": str(out_path),
                 "width": pixmap.width,
                 "height": pixmap.height,
             })
 
-        page_count = len(doc)
         doc.close()
 
         return {
@@ -130,9 +226,15 @@ def download_figure(arxiv_url: str = "", max_images: int = 6, dpi: int = 150) ->
             "pdf_path": str(pdf_path),
             "output_dir": str(out_dir),
             "page_count": page_count,
+            "candidates_found": len(candidates),
             "item_count": len(items),
             "items": items,
-            "note": "embedded_figure = extracted raster image; table_page = full page rendered as PNG because its text mentions 'Table N'.",
+            "note": (
+                "Selected up to "
+                f"{MAX_IMAGES_CAP} highest-value images (results captions prioritized over "
+                "method/overview captions) out of "
+                f"{len(candidates)} captioned candidates, to keep multimodal token cost low."
+            ),
         }
     except Exception as exc:
         return err("download_figure", exc)
