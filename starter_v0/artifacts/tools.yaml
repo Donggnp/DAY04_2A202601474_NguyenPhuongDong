@@ -119,11 +119,11 @@ tools:
 
   # ---------------- Team tool ----------------
   - name: download_figure
-    description: "Trích hình/bảng biểu của một bài báo arXiv thành ảnh PNG."
+    description: "Trích tối đa 4 hình/bảng kết quả quan trọng nhất của một bài báo arXiv thành ảnh PNG, ưu tiên bảng/hình kết quả (results) hơn hình method/overview."
     parameters:
       type: object
       properties:
         arxiv_url: {type: string, default: "", description: "ID hoặc địa chỉ"}
-        max_images: {type: integer, default: 6, description: "Số ảnh tối đa"}
+        max_images: {type: integer, default: 4, description: "Số ảnh tối đa (tối đa 4)"}
         dpi: {type: integer, default: 150, description: "Độ phân giải ảnh trang bảng biểu"}
       required: [arxiv_url]
