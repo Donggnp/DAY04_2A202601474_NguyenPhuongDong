@@ -7,8 +7,8 @@
 ## Team
 
 - Team: DAY04_2A202601474_NguyenPhuongDong
-- Members: Nguyễn Phương Đông
-- Provider/model: openai / gpt-5.4-mini (local proxy)
+- Members: Nguyễn Phương Đông - 2A202601474
+- Provider/model: openai / gpt-4o-mini (local proxy)
 
 ---
 
