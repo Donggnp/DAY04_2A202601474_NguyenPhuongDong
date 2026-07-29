@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -30,6 +32,75 @@ RESEARCH_TOOLS_7 = [
     "paper_text",
     "download_figure",
 ]
+
+
+def preprocess_markdown_images(text: str) -> str:
+    """
+    Finds local image paths in markdown (including sandbox:..., file://..., or raw paths)
+    and converts them to base64 data URIs so Streamlit st.markdown() renders them inline.
+    """
+    if not text:
+        return text
+
+    def _to_base64_uri(path_obj: Path) -> str | None:
+        if path_obj.exists() and path_obj.is_file():
+            try:
+                ext = path_obj.suffix.lstrip(".").lower()
+                if ext == "jpg":
+                    ext = "jpeg"
+                mime = f"image/{ext if ext in ['png', 'jpeg', 'gif', 'webp'] else 'png'}"
+                b64_data = base64.b64encode(path_obj.read_bytes()).decode("utf-8")
+                return f"data:{mime};base64,{b64_data}"
+            except Exception:
+                pass
+        return None
+
+    # 1. Match markdown image syntax ![alt](path)
+    def _replace_markdown_img(match):
+        alt_text = match.group(1)
+        raw_path = match.group(2).strip()
+
+        clean_path_str = raw_path
+        if clean_path_str.startswith("sandbox:"):
+            clean_path_str = clean_path_str[len("sandbox:"):]
+        if clean_path_str.startswith("file://"):
+            clean_path_str = clean_path_str[len("file://"):]
+
+        path_obj = Path(clean_path_str)
+        if not path_obj.is_absolute():
+            path_obj = (ROOT / clean_path_str).resolve()
+
+        b64_uri = _to_base64_uri(path_obj)
+        if b64_uri:
+            return f"![{alt_text}]({b64_uri})"
+        return match.group(0)
+
+    md_pattern = r"!\[(.*?)\]\((?:sandbox:|file:\/\/)?([^)]+)\)"
+    processed = re.sub(md_pattern, _replace_markdown_img, text)
+
+    # 2. Match raw sandbox: or file path image references not enclosed in ![alt](...)
+    def _replace_raw_path(match):
+        raw_path = match.group(0).strip()
+        clean_path_str = raw_path
+        if clean_path_str.startswith("sandbox:"):
+            clean_path_str = clean_path_str[len("sandbox:"):]
+        if clean_path_str.startswith("file://"):
+            clean_path_str = clean_path_str[len("file://"):]
+
+        path_obj = Path(clean_path_str)
+        if not path_obj.is_absolute():
+            path_obj = (ROOT / clean_path_str).resolve()
+
+        b64_uri = _to_base64_uri(path_obj)
+        if b64_uri:
+            return f"![Figure/Table]({b64_uri})"
+        return match.group(0)
+
+    raw_path_pattern = r"(?<!data:image\/png;base64,)(?:sandbox:|file:\/\/)?(\/[^\n\r\"\']+\.(?:png|jpg|jpeg|webp|gif))"
+    processed = re.sub(raw_path_pattern, _replace_raw_path, processed)
+
+    return processed
+
 
 # Page Configuration
 st.set_page_config(
@@ -82,17 +153,6 @@ st.markdown(
         font-size: 0.9rem;
     }
     
-    /* Trace Accordion Box */
-    .trace-box {
-        background-color: #F8FAFC;
-        border-left: 4px solid #3B82F6;
-        padding: 10px 14px;
-        margin: 8px 0;
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 0.88rem;
-    }
-    
     /* Quick Prompt Button Styling */
     div.stButton > button {
         border-radius: 8px;
@@ -134,7 +194,6 @@ initialize_session()
 # Sidebar Configuration
 st.sidebar.markdown("## ⚙️ Configuration & Model")
 
-# Available Providers & Defaults
 provider_option = st.sidebar.selectbox(
     "Provider",
     options=["openai", "gemini", "openrouter", "anthropic"],
@@ -170,7 +229,6 @@ for tool_info in tool_declarations:
 
 st.sidebar.markdown("---")
 
-# Inspect Artifacts Collapsible
 with st.sidebar.expander("📄 View System Prompt"):
     system_prompt_content = (ARTIFACTS_DIR / "system_prompt.md").read_text(encoding="utf-8")
     st.code(system_prompt_content, language="markdown")
@@ -186,7 +244,7 @@ if st.sidebar.button("🗑️ Reset Chat & Transcript", use_container_width=True
     st.session_state.turn_index = 0
     st.rerun()
 
-# Main Area Header
+# Main Header
 col_header, col_ver = st.columns([4, 1])
 with col_header:
     st.markdown('<div class="main-header">🔬 Research Paper AI Agent</div>', unsafe_allow_html=True)
@@ -207,8 +265,8 @@ with demo_cols[0]:
     if st.button("🔎 1. Tìm paper RAG trên arXiv", use_container_width=True):
         prompt_to_submit = "Tìm giúp mình 5 bài báo arXiv mới nhất về Retrieval Augmented Generation."
 with demo_cols[1]:
-    if st.button("📖 2. Đọc arXiv paper 1706.03762", use_container_width=True):
-        prompt_to_submit = "Đọc nội dung bài báo arXiv 1706.03762, lấy 3 trang đầu."
+    if st.button("📖 2. Đọc arXiv 1706.03762 & hình ảnh", use_container_width=True):
+        prompt_to_submit = "Đọc nội dung bài báo arXiv 1706.03762, lấy 3 trang đầu và ảnh của nó."
 with demo_cols[2]:
     if st.button("📊 3. Trích hình ảnh paper 2303.08774", use_container_width=True):
         prompt_to_submit = "Trích xuất hình ảnh kết quả từ paper arXiv 2303.08774."
@@ -223,41 +281,53 @@ with demo_cols2[1]:
 
 st.markdown("---")
 
+
+def extract_figure_items_from_results(tool_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    extracted = []
+    for event in tool_events:
+        if event.get("tool") == "download_figure":
+            res = event.get("result", {})
+            if isinstance(res, dict) and "items" in res:
+                for item in res.get("items", []):
+                    if item.get("image_path") and os.path.exists(item.get("image_path")):
+                        extracted.append(item)
+    return extracted
+
+
 # Render Existing Chat Messages
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-        
-        # If assistant message has rounds / tool trace attached, render it nicely
-        if msg["role"] == "assistant" and "rounds" in msg:
+        processed_content = preprocess_markdown_images(msg["content"])
+        st.markdown(processed_content)
+
+        if msg["role"] == "assistant":
             rounds = msg.get("rounds", [])
             tool_events = msg.get("tool_events", [])
-            
+
+            # Render extracted figures gallery if download_figure produced images
+            fig_items = extract_figure_items_from_results(tool_events)
+            if fig_items:
+                st.markdown("##### 🖼️ Visual Figures & Tables Gallery:")
+                fig_cols = st.columns(min(len(fig_items), 2))
+                for idx, fig_item in enumerate(fig_items):
+                    with fig_cols[idx % 2]:
+                        st.image(
+                            fig_item["image_path"],
+                            caption=f"Page {fig_item.get('page')}: {fig_item.get('caption', '')}",
+                            use_container_width=True,
+                        )
+
+            # Render Tool Call Trace accordion
             if rounds:
                 with st.expander(f"🔍 Tool Call Trace ({len(tool_events)} tool calls across {len(rounds)} rounds)"):
                     for r in rounds:
                         st.markdown(f"**Round {r.get('round')}**")
                         for tc in r.get("tool_calls", []):
                             st.code(f"🔧 Tool: {tc['name']}\nArgs: {json.dumps(tc['args'], ensure_ascii=False)}", language="json")
-                        
+
                         for tr in r.get("tool_results", []):
                             st.caption(f"Result for `{tr.get('tool')}`:")
-                            res = tr.get("result", {})
-                            st.json(res)
-                            
-                            # Render extracted figures if tool was download_figure
-                            if tr.get("tool") == "download_figure" and isinstance(res, dict) and "items" in res:
-                                st.markdown("##### 🖼️ Extracted Figures & Tables:")
-                                fig_cols = st.columns(2)
-                                for idx, fig_item in enumerate(res.get("items", [])):
-                                    img_path = fig_item.get("image_path")
-                                    if img_path and os.path.exists(img_path):
-                                        with fig_cols[idx % 2]:
-                                            st.image(
-                                                img_path,
-                                                caption=f"Page {fig_item.get('page')}: {fig_item.get('caption', '')}",
-                                                use_container_width=True,
-                                            )
+                            st.json(tr.get("result", {}))
 
 # Handle Chat Input
 chat_input_val = st.chat_input("Nhập câu hỏi hoặc yêu cầu nghiên cứu của bạn...")
@@ -276,7 +346,6 @@ if prompt_to_submit:
     selected_model = model_override.strip() or getattr(provider, "default_model", None)
     artifact_version = build_artifact_version(version_option, ARTIFACTS_DIR / "system_prompt.md", ARTIFACTS_DIR / "tools.yaml")
 
-    # Initialize transcript logging if not already created
     if st.session_state.transcript is None:
         timestamp = datetime.now().strftime("%Y%m%dT%H%M%S%f")
         transcript_id = "_".join([
@@ -317,7 +386,7 @@ if prompt_to_submit:
         "tool_events": [],
     }
 
-    # 3. Execute model tool loop with spinner
+    # 3. Execute model tool loop
     with st.chat_message("assistant"):
         with st.spinner("🤖 Agent đang suy nghĩ và gọi tools..."):
             try:
@@ -330,39 +399,39 @@ if prompt_to_submit:
                 )
                 turn_record.update(result)
                 assistant_text = result["assistant_text"]
-                
-                st.markdown(assistant_text)
-                
-                # Render tool trace
+
+                # Process content to inline base64 image URIs
+                processed_text = preprocess_markdown_images(assistant_text)
+                st.markdown(processed_text)
+
                 rounds = result.get("rounds", [])
                 tool_events = result.get("tool_events", [])
+
+                # Render extracted figures gallery
+                fig_items = extract_figure_items_from_results(tool_events)
+                if fig_items:
+                    st.markdown("##### 🖼️ Visual Figures & Tables Gallery:")
+                    fig_cols = st.columns(min(len(fig_items), 2))
+                    for idx, fig_item in enumerate(fig_items):
+                        with fig_cols[idx % 2]:
+                            st.image(
+                                fig_item["image_path"],
+                                caption=f"Page {fig_item.get('page')}: {fig_item.get('caption', '')}",
+                                use_container_width=True,
+                            )
+
+                # Render Tool Call Trace accordion
                 if rounds:
                     with st.expander(f"🔍 Tool Call Trace ({len(tool_events)} tool calls across {len(rounds)} rounds)", expanded=True):
                         for r in rounds:
                             st.markdown(f"**Round {r.get('round')}**")
                             for tc in r.get("tool_calls", []):
                                 st.code(f"🔧 Tool: {tc['name']}\nArgs: {json.dumps(tc['args'], ensure_ascii=False)}", language="json")
-                            
+
                             for tr in r.get("tool_results", []):
                                 st.caption(f"Result for `{tr.get('tool')}`:")
-                                res = tr.get("result", {})
-                                st.json(res)
-                                
-                                # Render figures if download_figure was executed
-                                if tr.get("tool") == "download_figure" and isinstance(res, dict) and "items" in res:
-                                    st.markdown("##### 🖼️ Extracted Figures & Tables:")
-                                    fig_cols = st.columns(2)
-                                    for idx, fig_item in enumerate(res.get("items", [])):
-                                        img_path = fig_item.get("image_path")
-                                        if img_path and os.path.exists(img_path):
-                                            with fig_cols[idx % 2]:
-                                                st.image(
-                                                    img_path,
-                                                    caption=f"Page {fig_item.get('page')}: {fig_item.get('caption', '')}",
-                                                    use_container_width=True,
-                                                )
+                                st.json(tr.get("result", {}))
 
-                # Save assistant response to state
                 st.session_state.messages.append({
                     "role": "assistant",
                     "content": assistant_text,
@@ -381,7 +450,6 @@ if prompt_to_submit:
                 st.error(f"⚠️ {error_msg}")
                 st.session_state.messages.append({"role": "assistant", "content": f"⚠️ {error_msg}"})
 
-    # Save transcript log to file
     turn_record["ended_at"] = now_iso()
     st.session_state.transcript["turns"].append(turn_record)
     write_transcript(st.session_state.transcript_path, st.session_state.transcript)
