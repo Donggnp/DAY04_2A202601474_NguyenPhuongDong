@@ -1,0 +1,265 @@
+{
+  "transcript_id": "v3_openai_20260729T164455782453",
+  "version": "v3",
+  "artifact_version": "v3+p7579fbd5d687+t7180c2956433",
+  "prompt_hash": "7579fbd5d687469ed499b524ed86cb3d429cc5c0bbb0855b7212e16fa8494f10",
+  "tools_hash": "7180c29564334f5d4b395b8f011813c75ee2ddf73638e1d236b53fa5419dfb84",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "system_prompt": "/home/dongg/Bản tải về/DAY04_2A202601474_NguyenPhuongDong/starter_v0/artifacts/system_prompt.md",
+  "tools": "/home/dongg/Bản tải về/DAY04_2A202601474_NguyenPhuongDong/starter_v0/artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 5,
+  "active_tools": [
+    "clarify",
+    "lookup",
+    "fetch",
+    "format",
+    "papers",
+    "paper_text",
+    "download_figure"
+  ],
+  "created_at": "2026-07-29T16:44:55",
+  "updated_at": "2026-07-29T16:45:28",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-07-29T16:44:55",
+      "user": "xin chào",
+      "status": "answered",
+      "assistant_text": "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [],
+      "ended_at": "2026-07-29T16:44:58"
+    },
+    {
+      "turn_index": 2,
+      "started_at": "2026-07-29T16:45:17",
+      "user": "Tìm giúp mình 3 bài báo arXiv mới nhất về Retrieval Augmented Generation.",
+      "status": "answered",
+      "assistant_text": "Dưới đây là 3 bài báo arXiv mới nhất về Retrieval Augmented Generation:\n\n1. **[Detecting Knowledge Inconsistencies Across Text, Tables, and Knowledge Graphs](http://arxiv.org/abs/2607.25959v1)**\n   - **Tác giả**: Fanfu Wei, Thibault Ehrhart, Raphaël Troncy\n   - **Tóm tắt**: Bài báo nghiên cứu cách phát hiện và giải thích các mâu thuẫn giữa các phương thức thông tin khác nhau như văn bản, bảng và đồ thị tri thức. Nó giới thiệu một khung tự động có tên là Kontrast để so sánh các câu trả lời dựa trên bảng với bằng chứng từ đồ thị tri thức.\n   - **Ngày xuất bản**: 28 tháng 7, 2026\n   - **[PDF](https://arxiv.org/pdf/2607.25959v1)**\n\n2. **[Beyond Self-Knowledge: Propagating Uncertainty Across Reasoning and Retrieval in LLMs](http://arxiv.org/abs/2607.25600v1)**\n   - **Tác giả**: Chandan Kumar Sah, Xiaoli Lian, Li Zhang\n   - **Tóm tắt**: Bài báo này nghiên cứu cách mà sự tự tin được diễn đạt từ các mô hình ngôn ngữ có thể được sử dụng như một tín hiệu cho việc định tuyến truy xuất. Phương pháp được giới thiệu có tên là BeyondUncertainty, giúp cải thiện hiệu suất trong các bài toán hỏi đáp.\n   - **Ngày xuất bản**: 28 tháng 7, 2026\n   - **[PDF](https://arxiv.org/pdf/2607.25600v1)**\n\n3. **[The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers](http://arxiv.org/abs/2607.25346v1)**\n   - **Tác giả**: Zhe Xu, Prachi Agrawal, Kavosh Asadi, và nhiều tác giả khác\n   - **Tóm tắt**: Bài báo này đề xuất một kiến trúc hai tháp mới cho việc truy xuất thông tin, sử dụng các mô hình ngôn ngữ như là các nền tảng đại diện thay vì các động cơ sinh. Nó cho thấy rằng kiến trúc này có thể đạt được hiệu suất truy xuất cao mà không cần đến các mô hình sinh.\n   - **Ngày xuất bản**: 28 tháng 7, 2026\n   - **[PDF](https://arxiv.org/pdf/2607.25346v1)**\n\nNếu bạn cần thêm thông tin hoặc có yêu cầu khác, hãy cho tôi biết!",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": null,
+          "tool_calls": [
+            {
+              "name": "papers",
+              "args": {
+                "query": "Retrieval Augmented Generation",
+                "max_results": 3,
+                "sort_by": "submittedDate"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "papers",
+              "args": {
+                "query": "Retrieval Augmented Generation",
+                "max_results": 3,
+                "sort_by": "submittedDate"
+              },
+              "result": {
+                "tool": "arxiv_search",
+                "query": "Retrieval Augmented Generation",
+                "api_query": "all:Retrieval AND all:Augmented AND all:Generation",
+                "total_results": 7918,
+                "items": [
+                  {
+                    "arxiv_id": "2607.25959v1",
+                    "title": "Detecting Knowledge Inconsistencies Across Text, Tables, and Knowledge Graphs",
+                    "summary": "Wikipedia and Wikidata are widely used for information access, LLM pre-training, and retrieval-augmented generation. Their knowledge is deeply connected but scattered across text, tables, and knowledge graphs. This raises a practical question: when these modalities disagree, how can we detect and explain the conflict? We study this problem as \\emph{modality-level inconsistency detection}. We first introduce a taxonomy of cross-modal knowledge inconsistencies, covering information granularity differences, direct conflicts, temporal changes, and KG incompleteness. We then present \\textsc{Kontrast}, an automatic framework that uses Text-to-SPARQL and LLM reasoning to compare table-based answers with KG evidence and categorize the resulting inconsistencies. Experiments on various Table-QA datasets show that cross-modal inconsistencies are common and informative. They reveal not only true knowledge conflicts, but also missing KG structure and temporal mismatches while being limited by Text-to-SPARQL errors and noise. Our analysis shows that text, tables, and KGs can complement and correct one another through systematic comparison. \\textsc{Kontrast} provides a practical tool for large-scale knowledge auditing and establishes a benchmark for future work on cross-modal knowledge consistency. Code and data are available at https://github.com/ECLADATTA/KONTRAST.",
+                    "authors": [
+                      "Fanfu Wei",
+                      "Thibault Ehrhart",
+                      "Raphaël Troncy"
+                    ],
+                    "published": "2026-07-28T16:43:56Z",
+                    "updated": "2026-07-28T16:43:56Z",
+                    "url": "http://arxiv.org/abs/2607.25959v1",
+                    "pdf_url": "https://arxiv.org/pdf/2607.25959v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.CL",
+                    "categories": [
+                      "cs.CL",
+                      "cs.AI"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2607.25600v1",
+                    "title": "Beyond Self-Knowledge: Propagating Uncertainty Across Reasoning and Retrieval in LLMs",
+                    "summary": "Retrieval-augmented generation improves knowledge-intensive question answering, but indiscriminate retrieval can introduce irrelevant evidence and unnecessary computation. We investigate whether verbalized confidence from black-box language models can serve as an actionable signal for retrieval routing. Our method, BeyondUncertainty, first elicits a structured provisional answer and confidence estimate, then applies a model-specific threshold selected on held-out validation data and frozen before test evaluation. Low-confidence questions receive top-$5$ TF--IDF retrieval followed by a second answer call, whereas high-confidence questions return the provisional answer directly. We evaluate 27,000 policy instances across six QA benchmarks, three model families, and three retrieval policies. BeyondUncertainty achieves $0.483$ mean token-level F1, compared with $0.467$ for always retrieval and $0.401$ for no retrieval, while reducing retrieved passages by $20.4\\%$ relative to always retrieval. When matched on the number of questions routed to retrieval within each dataset--model cell, it outperforms a post-hoc random allocation in 17 of 18 settings, with an average gain of 0.024 F1. Although poorly calibrated as an absolute probability, probe uncertainty modestly predicts question-level retrieval benefit (AUROC $=0.628$). However, the additional probe increases total token usage by $28.2\\%$, revealing a trade-off between more selective evidence acquisition and end-to-end token efficiency.",
+                    "authors": [
+                      "Chandan Kumar Sah",
+                      "Xiaoli Lian",
+                      "Li Zhang"
+                    ],
+                    "published": "2026-07-28T11:30:25Z",
+                    "updated": "2026-07-28T11:30:25Z",
+                    "url": "http://arxiv.org/abs/2607.25600v1",
+                    "pdf_url": "https://arxiv.org/pdf/2607.25600v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.IR",
+                    "categories": [
+                      "cs.IR",
+                      "cs.AI",
+                      "cs.CL"
+                    ]
+                  },
+                  {
+                    "arxiv_id": "2607.25346v1",
+                    "title": "The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers",
+                    "summary": "Large Language Models (LLMs) have emerged as powerful assets for recommender systems. However, deploying them as generative recommenders or zero-shot rankers at web-scale remains bottlenecked by prohibitive computational overhead and grounding challenges. In this paper, we revitalize the classic, highly efficient two-tower retrieval architecture by adapting LLMs as semantic representation backbones rather than generative engines. We introduce an LLM-native two-tower framework engineered for high-throughput, large-scale retrieval. Our architecture introduces several key innovations: a shared LLM encoder for joint user-item modeling, End-Of-Sentence (EOS) token pooling for compact sequence embedding, cross-dataset transfer learning, knowledge distillation from powerful cross-encoder teachers, and latent reasoning within the user tower. Extensive evaluation across three public benchmarks demonstrates that cross-encoder architecture outperforms current state-of-the-art (SoTA) models, while the efficient two-tower student achieves SoTA-comparable retrieval performance. Furthermore, experiments on internal large-scale production systems yield substantial topline retrieval improvements along with high resilience to model staleness and superior data scaling. Our findings demonstrate that when augmented with modern representation learning, the traditional two-tower paradigm remains an exceptionally competitive and practical solution for industrial retrieval systems.",
+                    "authors": [
+                      "Zhe Xu",
+                      "Prachi Agrawal",
+                      "Kavosh Asadi",
+                      "Tianyi Chen",
+                      "Carl Hu",
+                      "Justin Johnson",
+                      "Wuwei Lan",
+                      "Mingfu Liang",
+                      "Xi Liu",
+                      "Tik On Lui",
+                      "Oladipo Ositelu",
+                      "Sandeep Pandey",
+                      "Ankit Peshin",
+                      "Feng Qi",
+                      "Anil Ramakrishna",
+                      "Kaushik Rangadurai",
+                      "Frank Shyu",
+                      "Luke Simon",
+                      "Yang Yang",
+                      "Chiyu Zhang"
+                    ],
+                    "published": "2026-07-28T06:47:53Z",
+                    "updated": "2026-07-28T06:47:53Z",
+                    "url": "http://arxiv.org/abs/2607.25346v1",
+                    "pdf_url": "https://arxiv.org/pdf/2607.25346v1",
+                    "source": "arxiv.org",
+                    "primary_category": "cs.IR",
+                    "categories": [
+                      "cs.IR"
+                    ]
+                  }
+                ],
+                "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "assistant_text": "Dưới đây là 3 bài báo arXiv mới nhất về Retrieval Augmented Generation:\n\n1. **[Detecting Knowledge Inconsistencies Across Text, Tables, and Knowledge Graphs](http://arxiv.org/abs/2607.25959v1)**\n   - **Tác giả**: Fanfu Wei, Thibault Ehrhart, Raphaël Troncy\n   - **Tóm tắt**: Bài báo nghiên cứu cách phát hiện và giải thích các mâu thuẫn giữa các phương thức thông tin khác nhau như văn bản, bảng và đồ thị tri thức. Nó giới thiệu một khung tự động có tên là Kontrast để so sánh các câu trả lời dựa trên bảng với bằng chứng từ đồ thị tri thức.\n   - **Ngày xuất bản**: 28 tháng 7, 2026\n   - **[PDF](https://arxiv.org/pdf/2607.25959v1)**\n\n2. **[Beyond Self-Knowledge: Propagating Uncertainty Across Reasoning and Retrieval in LLMs](http://arxiv.org/abs/2607.25600v1)**\n   - **Tác giả**: Chandan Kumar Sah, Xiaoli Lian, Li Zhang\n   - **Tóm tắt**: Bài báo này nghiên cứu cách mà sự tự tin được diễn đạt từ các mô hình ngôn ngữ có thể được sử dụng như một tín hiệu cho việc định tuyến truy xuất. Phương pháp được giới thiệu có tên là BeyondUncertainty, giúp cải thiện hiệu suất trong các bài toán hỏi đáp.\n   - **Ngày xuất bản**: 28 tháng 7, 2026\n   - **[PDF](https://arxiv.org/pdf/2607.25600v1)**\n\n3. **[The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers](http://arxiv.org/abs/2607.25346v1)**\n   - **Tác giả**: Zhe Xu, Prachi Agrawal, Kavosh Asadi, và nhiều tác giả khác\n   - **Tóm tắt**: Bài báo này đề xuất một kiến trúc hai tháp mới cho việc truy xuất thông tin, sử dụng các mô hình ngôn ngữ như là các nền tảng đại diện thay vì các động cơ sinh. Nó cho thấy rằng kiến trúc này có thể đạt được hiệu suất truy xuất cao mà không cần đến các mô hình sinh.\n   - **Ngày xuất bản**: 28 tháng 7, 2026\n   - **[PDF](https://arxiv.org/pdf/2607.25346v1)**\n\nNếu bạn cần thêm thông tin hoặc có yêu cầu khác, hãy cho tôi biết!",
+          "tool_calls": [],
+          "tool_results": []
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Retrieval Augmented Generation",
+            "max_results": 3,
+            "sort_by": "submittedDate"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "query": "Retrieval Augmented Generation",
+            "api_query": "all:Retrieval AND all:Augmented AND all:Generation",
+            "total_results": 7918,
+            "items": [
+              {
+                "arxiv_id": "2607.25959v1",
+                "title": "Detecting Knowledge Inconsistencies Across Text, Tables, and Knowledge Graphs",
+                "summary": "Wikipedia and Wikidata are widely used for information access, LLM pre-training, and retrieval-augmented generation. Their knowledge is deeply connected but scattered across text, tables, and knowledge graphs. This raises a practical question: when these modalities disagree, how can we detect and explain the conflict? We study this problem as \\emph{modality-level inconsistency detection}. We first introduce a taxonomy of cross-modal knowledge inconsistencies, covering information granularity differences, direct conflicts, temporal changes, and KG incompleteness. We then present \\textsc{Kontrast}, an automatic framework that uses Text-to-SPARQL and LLM reasoning to compare table-based answers with KG evidence and categorize the resulting inconsistencies. Experiments on various Table-QA datasets show that cross-modal inconsistencies are common and informative. They reveal not only true knowledge conflicts, but also missing KG structure and temporal mismatches while being limited by Text-to-SPARQL errors and noise. Our analysis shows that text, tables, and KGs can complement and correct one another through systematic comparison. \\textsc{Kontrast} provides a practical tool for large-scale knowledge auditing and establishes a benchmark for future work on cross-modal knowledge consistency. Code and data are available at https://github.com/ECLADATTA/KONTRAST.",
+                "authors": [
+                  "Fanfu Wei",
+                  "Thibault Ehrhart",
+                  "Raphaël Troncy"
+                ],
+                "published": "2026-07-28T16:43:56Z",
+                "updated": "2026-07-28T16:43:56Z",
+                "url": "http://arxiv.org/abs/2607.25959v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.25959v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.CL",
+                "categories": [
+                  "cs.CL",
+                  "cs.AI"
+                ]
+              },
+              {
+                "arxiv_id": "2607.25600v1",
+                "title": "Beyond Self-Knowledge: Propagating Uncertainty Across Reasoning and Retrieval in LLMs",
+                "summary": "Retrieval-augmented generation improves knowledge-intensive question answering, but indiscriminate retrieval can introduce irrelevant evidence and unnecessary computation. We investigate whether verbalized confidence from black-box language models can serve as an actionable signal for retrieval routing. Our method, BeyondUncertainty, first elicits a structured provisional answer and confidence estimate, then applies a model-specific threshold selected on held-out validation data and frozen before test evaluation. Low-confidence questions receive top-$5$ TF--IDF retrieval followed by a second answer call, whereas high-confidence questions return the provisional answer directly. We evaluate 27,000 policy instances across six QA benchmarks, three model families, and three retrieval policies. BeyondUncertainty achieves $0.483$ mean token-level F1, compared with $0.467$ for always retrieval and $0.401$ for no retrieval, while reducing retrieved passages by $20.4\\%$ relative to always retrieval. When matched on the number of questions routed to retrieval within each dataset--model cell, it outperforms a post-hoc random allocation in 17 of 18 settings, with an average gain of 0.024 F1. Although poorly calibrated as an absolute probability, probe uncertainty modestly predicts question-level retrieval benefit (AUROC $=0.628$). However, the additional probe increases total token usage by $28.2\\%$, revealing a trade-off between more selective evidence acquisition and end-to-end token efficiency.",
+                "authors": [
+                  "Chandan Kumar Sah",
+                  "Xiaoli Lian",
+                  "Li Zhang"
+                ],
+                "published": "2026-07-28T11:30:25Z",
+                "updated": "2026-07-28T11:30:25Z",
+                "url": "http://arxiv.org/abs/2607.25600v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.25600v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.IR",
+                "categories": [
+                  "cs.IR",
+                  "cs.AI",
+                  "cs.CL"
+                ]
+              },
+              {
+                "arxiv_id": "2607.25346v1",
+                "title": "The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers",
+                "summary": "Large Language Models (LLMs) have emerged as powerful assets for recommender systems. However, deploying them as generative recommenders or zero-shot rankers at web-scale remains bottlenecked by prohibitive computational overhead and grounding challenges. In this paper, we revitalize the classic, highly efficient two-tower retrieval architecture by adapting LLMs as semantic representation backbones rather than generative engines. We introduce an LLM-native two-tower framework engineered for high-throughput, large-scale retrieval. Our architecture introduces several key innovations: a shared LLM encoder for joint user-item modeling, End-Of-Sentence (EOS) token pooling for compact sequence embedding, cross-dataset transfer learning, knowledge distillation from powerful cross-encoder teachers, and latent reasoning within the user tower. Extensive evaluation across three public benchmarks demonstrates that cross-encoder architecture outperforms current state-of-the-art (SoTA) models, while the efficient two-tower student achieves SoTA-comparable retrieval performance. Furthermore, experiments on internal large-scale production systems yield substantial topline retrieval improvements along with high resilience to model staleness and superior data scaling. Our findings demonstrate that when augmented with modern representation learning, the traditional two-tower paradigm remains an exceptionally competitive and practical solution for industrial retrieval systems.",
+                "authors": [
+                  "Zhe Xu",
+                  "Prachi Agrawal",
+                  "Kavosh Asadi",
+                  "Tianyi Chen",
+                  "Carl Hu",
+                  "Justin Johnson",
+                  "Wuwei Lan",
+                  "Mingfu Liang",
+                  "Xi Liu",
+                  "Tik On Lui",
+                  "Oladipo Ositelu",
+                  "Sandeep Pandey",
+                  "Ankit Peshin",
+                  "Feng Qi",
+                  "Anil Ramakrishna",
+                  "Kaushik Rangadurai",
+                  "Frank Shyu",
+                  "Luke Simon",
+                  "Yang Yang",
+                  "Chiyu Zhang"
+                ],
+                "published": "2026-07-28T06:47:53Z",
+                "updated": "2026-07-28T06:47:53Z",
+                "url": "http://arxiv.org/abs/2607.25346v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.25346v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.IR",
+                "categories": [
+                  "cs.IR"
+                ]
+              }
+            ],
+            "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+          }
+        }
+      ],
+      "ended_at": "2026-07-29T16:45:28"
+    }
+  ]
+}
