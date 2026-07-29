@@ -25,8 +25,17 @@ To keep multimodal token cost low, this is a **rank-and-cap** pipeline, not a
      this filters out logos, icons, and the individual sub-tiles of a
      composite figure that don't carry their own caption.
    - Pages whose text contains a `Table N` caption are kept as a
-     full-page-render candidate (tables are vector/text drawings, not
-     embedded images, so pass 1 alone would miss them).
+     **cropped table region**, not a full-page render (tables are vector/text
+     drawings, not embedded images, so pass 1 alone would miss them). The
+     crop is computed from real text-block geometry: sort the page's text
+     blocks top-to-bottom, start at the caption block, and keep absorbing
+     the next blocks as table rows as long as the vertical gap between them
+     stays under 28pt and the accumulated height stays under 320pt — the
+     first block that breaks either condition is body prose resuming, so the
+     region stops there. This keeps the rendered image to just the caption +
+     table instead of an entire A4 page with unrelated paragraphs, which was
+     wasting multimodal tokens and diluting what the model actually needed
+     to read.
 2. **Dedupe** candidates that resolve to the same caption text, keeping the
    largest one (handles composite figures made of several embedded xrefs).
 3. **Label + rank**: each caption is keyword-classified as `results`
