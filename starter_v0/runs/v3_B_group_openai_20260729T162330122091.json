@@ -1,0 +1,443 @@
+{
+  "run_id": "v3_B_group_openai_20260729T162330122091",
+  "version": "v3",
+  "artifact_version": "v3+p7579fbd5d687+td5e86e3cde77",
+  "prompt_hash": "7579fbd5d687469ed499b524ed86cb3d429cc5c0bbb0855b7212e16fa8494f10",
+  "tools_hash": "d5e86e3cde77c7ddcc46badc5cd56b84a888f0c28fb31326b985b9ea2103c624",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "system_prompt": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "starter_v0\\data\\eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Bộ đánh giá 10 test case (5 single-turn + 5 multi-turn) cho Research Paper Agent với 6 tool: papers, paper_text, lookup, fetch, clarify, format.",
+  "generated_at": "2026-07-29T16:23:30",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 0,
+    "provider_error_cases": 10,
+    "passed_cases": 0,
+    "case_accuracy": 0.0,
+    "failure_counts": {},
+    "observed_mismatch_counts": {}
+  },
+  "results": [
+    {
+      "id": "G01_arxiv_papers_search",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Tìm kiếm paper arXiv với từ khóa và tham số max_results=3"
+      },
+      "input": "Tìm giúp mình 3 bài báo arXiv mới nhất về Retrieval Augmented Generation.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G02_arxiv_paper_text_read",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Đọc nội dung text bài báo arXiv với arxiv_url ID và max_pages=2"
+      },
+      "input": "Đọc chi tiết giúp mình bài báo arXiv có ID 1706.03762 (lấy 2 trang đầu).",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G03_parallel_lookup_and_fetch",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Gọi song song lookup (tìm tin tức web) và fetch (đọc URL cụ thể)"
+      },
+      "input": "Tìm tin tức web mới nhất về model Claude 3.5 và tóm tắt link này: https://anthropic.com/news/claude",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5",
+              "topic": "news"
+            }
+          },
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G04_clarify_missing_paper_url",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Thiếu thông tin link hoặc ID bài báo -> gọi clarify hỏi lại người dùng"
+      },
+      "input": "Tóm tắt giúp mình bài báo này",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G05_out_of_scope_math",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Câu hỏi giải toán ngoài phạm vi tra cứu bài báo -> từ chối, không gọi tool"
+      },
+      "input": "Tính giúp mình tích phân từ 0 đến 1 của x^3 dx",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G06_multiturn_clarify_then_papers",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: tổng hợp query ở turn 2 và max_results=5 ở turn 3 để gọi papers"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm cho mình một số bài báo khoa học mới"
+        },
+        {
+          "role": "user",
+          "content": "Về chủ đề Graph Neural Networks nhé"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 5 bài báo arXiv tốt nhất"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G07_multiturn_clarify_url_then_paper_text",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: nhận arxiv_url từ turn 2 và max_pages=3 từ turn 3 để gọi paper_text"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đọc nội dung bài báo arXiv này giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "ID là 2303.08774"
+        },
+        {
+          "role": "user",
+          "content": "Đọc 3 trang đầu thôi nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G08_multiturn_switch_web_to_arxiv",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: đổi từ tìm web sang papers (arXiv) giữ nguyên query"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm trên web thông tin về AI Agent"
+        },
+        {
+          "role": "user",
+          "content": "Thôi bỏ web đi, tìm bài báo chính thức trên arXiv"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn chủ đề AI Agent nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G09_multiturn_format_digest",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu trình bày bản tin (digest) chọn template=brief"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm 3 bài báo về Transformer"
+        },
+        {
+          "role": "user",
+          "content": "Tổng hợp các bài báo vừa tìm thành bản tin digest"
+        },
+        {
+          "role": "user",
+          "content": "Dùng template brief nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "template": "brief"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G10_multiturn_no_tool_meta",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: hỏi khả năng meta ở turn cuối -> không gọi tool"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm bài báo arXiv về LLM"
+        },
+        {
+          "role": "user",
+          "content": "Cảm ơn bạn, mình đã đọc xong rồi"
+        },
+        {
+          "role": "user",
+          "content": "Bạn có thể tự viết một bài báo mới cho mình không?"
+        }
+      ],
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "NotFoundError: Error code: 404 - {'error': {'code': 'model_not_available', 'message': '模型 gpt-4o-mini 不在当前 API Key 的可用模型范围内', 'type': 'invalid_request_error'}}"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    }
+  ]
+}

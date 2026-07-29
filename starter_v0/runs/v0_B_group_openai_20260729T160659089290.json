@@ -1,0 +1,622 @@
+{
+  "run_id": "v0_B_group_openai_20260729T160659089290",
+  "version": "v0",
+  "artifact_version": "v0+peb1c8179815b+t6cdb53d5d7b8",
+  "prompt_hash": "eb1c8179815bd79d34de7d326420bb99b3072e6e8ae96464c02d4411f905fc68",
+  "tools_hash": "6cdb53d5d7b8de80d60b298b1357f462cedbedfae261d5ba60b08ccc401687c5",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openai",
+  "model": "gpt-5.4-mini",
+  "system_prompt": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Bộ đánh giá 10 test case (5 single-turn + 5 multi-turn) cho Research Paper Agent với 6 tool: papers, paper_text, lookup, fetch, clarify, format.",
+  "generated_at": "2026-07-29T16:06:59",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 9,
+    "case_accuracy": 0.9,
+    "tool_routing_accuracy": 0.9,
+    "argument_accuracy": 0.9,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {
+      "wrong_tool": 1
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_arxiv_papers_search",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Tìm kiếm paper arXiv với từ khóa và tham số max_results=3"
+      },
+      "input": "Tìm giúp mình 3 bài báo arXiv mới nhất về Retrieval Augmented Generation.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3,
+              "sort_by": "submittedDate"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Retrieval Augmented Generation",
+            "max_results": 3,
+            "sort_by": "submittedDate"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='export.arxiv.org', port=443): Max retries exceeded with url: /api/query?search_query=all%3ARetrieval+AND+all%3AAugmented+AND+all%3AGeneration&max_results=3&sortBy=submittedDate&sortOrder=descending (Caused by NewConnectionError(\"HTTPSConnection(host='export.arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_arxiv_paper_text_read",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Đọc nội dung text bài báo arXiv với arxiv_url ID và max_pages=2"
+      },
+      "input": "Đọc chi tiết giúp mình bài báo arXiv có ID 1706.03762 (lấy 2 trang đầu).",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2,
+              "max_chars": 12000
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "paper_text",
+          "args": {
+            "arxiv_url": "1706.03762",
+            "max_pages": 2,
+            "max_chars": 12000
+          },
+          "result": {
+            "tool": "get_arxiv_paper_text",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='arxiv.org', port=443): Max retries exceeded with url: /pdf/1706.03762.pdf (Caused by NewConnectionError(\"HTTPSConnection(host='arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_parallel_lookup_and_fetch",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Gọi song song lookup (tìm tin tức web) và fetch (đọc URL cụ thể)"
+      },
+      "input": "Tìm tin tức web mới nhất về model Claude 3.5 và tóm tắt link này: https://anthropic.com/news/claude",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5",
+              "topic": "news"
+            }
+          },
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5 latest news Anthropic official announcement site:anthropic.com/news/claude",
+              "topic": "news",
+              "timeframe": "month",
+              "max_results": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "query: expected 'Claude 3.5', got 'Claude 3.5 latest news Anthropic official announcement site:anthropic.com/news/claude'",
+          "missing tool call fetch"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "Claude 3.5 latest news Anthropic official announcement site:anthropic.com/news/claude",
+            "topic": "news",
+            "timeframe": "month",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "web_search",
+            "error": "RuntimeError",
+            "message": "Missing TAVILY_API_KEY env var"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_clarify_missing_paper_url",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Thiếu thông tin link hoặc ID bài báo -> gọi clarify hỏi lại người dùng"
+      },
+      "input": "Tóm tắt giúp mình bài báo này",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn gửi giúp mình link hoặc nội dung bài báo cần tóm tắt nhé — hiện mình chưa thấy bài báo nào được đính kèm.",
+              "response_type": "text",
+              "options": []
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn gửi giúp mình link hoặc nội dung bài báo cần tóm tắt nhé — hiện mình chưa thấy bài báo nào được đính kèm.",
+            "response_type": "text",
+            "options": []
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn gửi giúp mình link hoặc nội dung bài báo cần tóm tắt nhé — hiện mình chưa thấy bài báo nào được đính kèm.",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_out_of_scope_math",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Câu hỏi giải toán ngoài phạm vi tra cứu bài báo -> từ chối, không gọi tool"
+      },
+      "input": "Tính giúp mình tích phân từ 0 đến 1 của x^3 dx",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "\\[\n\\int_0^1 x^3\\,dx = \\left[\\frac{x^4}{4}\\right]_0^1 = \\frac{1}{4}\n\\]\n\nKết quả: **1/4**.",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G06_multiturn_clarify_then_papers",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: tổng hợp query ở turn 2 và max_results=5 ở turn 3 để gọi papers"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm cho mình một số bài báo khoa học mới"
+        },
+        {
+          "role": "user",
+          "content": "Về chủ đề Graph Neural Networks nhé"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 5 bài báo arXiv tốt nhất"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5,
+              "sort_by": "relevance"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Graph Neural Networks",
+            "max_results": 5,
+            "sort_by": "relevance"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='export.arxiv.org', port=443): Max retries exceeded with url: /api/query?search_query=all%3AGraph+AND+all%3ANeural+AND+all%3ANetworks&max_results=5&sortBy=relevance&sortOrder=descending (Caused by NewConnectionError(\"HTTPSConnection(host='export.arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_multiturn_clarify_url_then_paper_text",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: nhận arxiv_url từ turn 2 và max_pages=3 từ turn 3 để gọi paper_text"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đọc nội dung bài báo arXiv này giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "ID là 2303.08774"
+        },
+        {
+          "role": "user",
+          "content": "Đọc 3 trang đầu thôi nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3,
+              "max_chars": 12000
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "paper_text",
+          "args": {
+            "arxiv_url": "2303.08774",
+            "max_pages": 3,
+            "max_chars": 12000
+          },
+          "result": {
+            "tool": "get_arxiv_paper_text",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='arxiv.org', port=443): Max retries exceeded with url: /pdf/2303.08774.pdf (Caused by NewConnectionError(\"HTTPSConnection(host='arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_multiturn_switch_web_to_arxiv",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: đổi từ tìm web sang papers (arXiv) giữ nguyên query"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm trên web thông tin về AI Agent"
+        },
+        {
+          "role": "user",
+          "content": "Thôi bỏ web đi, tìm bài báo chính thức trên arXiv"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn chủ đề AI Agent nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent",
+              "max_results": 5,
+              "sort_by": "relevance"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "AI Agent",
+            "max_results": 5,
+            "sort_by": "relevance"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='export.arxiv.org', port=443): Max retries exceeded with url: /api/query?search_query=all%3AAI+AND+all%3AAgent&max_results=5&sortBy=relevance&sortOrder=descending (Caused by NewConnectionError(\"HTTPSConnection(host='export.arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_multiturn_format_digest",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu trình bày bản tin (digest) chọn template=brief"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm 3 bài báo về Transformer"
+        },
+        {
+          "role": "user",
+          "content": "Tổng hợp các bài báo vừa tìm thành bản tin digest"
+        },
+        {
+          "role": "user",
+          "content": "Dùng template brief nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "template": "brief"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "items": [],
+              "template": "brief",
+              "headline": "Transformer digest"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "items": [],
+            "template": "brief",
+            "headline": "Transformer digest"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "brief",
+            "markdown": "**Transformer digest**\n\n",
+            "item_count": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_multiturn_no_tool_meta",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: hỏi khả năng meta ở turn cuối -> không gọi tool"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm bài báo arXiv về LLM"
+        },
+        {
+          "role": "user",
+          "content": "Cảm ơn bạn, mình đã đọc xong rồi"
+        },
+        {
+          "role": "user",
+          "content": "Bạn có thể tự viết một bài báo mới cho mình không?"
+        }
+      ],
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Được chứ — dưới đây là một bài báo ngắn mới bằng tiếng Việt về **LLM (Large Language Models)**, theo phong cách phổ thông, dễ đọc:\n\n---\n\n# Mô hình ngôn ngữ lớn (LLM): Bước tiến mới của trí tuệ nhân tạo\n\nTrong vài năm trở lại đây, cụm từ **LLM** hay **mô hình ngôn ngữ lớn** xuất hiện ngày càng nhiều trong các cuộc thảo luận về trí tuệ nhân tạo. Từ chatbot, công cụ viết nội dung, trợ lý lập trình cho đến hệ thống tìm kiếm thông minh, LLM đang trở thành một trong những công nghệ có ảnh hưởng mạnh mẽ nhất hiện nay.\n\n## LLM là gì?\n\nLLM là những mô hình học máy được huấn luyện trên lượng dữ liệu văn bản rất lớn để hiểu và tạo ra ngôn ngữ tự nhiên. Chúng có thể dự đoán từ tiếp theo trong câu, trả lời câu hỏi, tóm tắt văn bản, dịch ngôn ngữ và thậm chí viết mã lập trình.\n\nĐiểm nổi bật của LLM là khả năng **suy luận theo ngữ cảnh** và tạo ra đầu ra tự nhiên, giống cách con người giao tiếp. Nhờ đó, chúng có thể hỗ trợ rất nhiều tác vụ khác nhau mà không cần lập trình riêng cho từng trường hợp.\n\n## Vì sao LLM quan trọng?\n\nSự khác biệt của LLM so với các hệ thống AI truyền thống nằm ở tính linh hoạt. Trước đây, một mô hình thường chỉ làm tốt một nhiệm vụ cụ thể. Ngược lại, một LLM hiện đại có thể:\n\n- Trả lời câu hỏi bằng ngôn ngữ tự nhiên\n- Viết email, bài luận, bài báo\n- Tóm tắt tài liệu dài\n- Hỗ trợ dịch thuật\n- Viết và sửa mã nguồn\n- Phân tích dữ liệu ở mức ngôn ngữ\n\nĐiều này giúp LLM trở thành nền tảng cho nhiều sản phẩm AI thế hệ mới.\n\n## LLM hoạt động như thế nào?\n\nỞ mức đơn giản, LLM học bằng cách đọc một lượng lớn văn bản từ sách, bài báo, website và nhiều nguồn dữ liệu khác. Trong quá trình huấn luyện, mô hình học các mối liên hệ giữa từ, cụm từ và cấu trúc câu. Từ đó, nó phát hiện ra các mẫu ngôn ngữ và học cách tạo ra văn bản hợp lý.\n\nCác mô hình hiện đại thường dựa trên kiến trúc **Transformer**, vốn cho phép xử lý ngữ cảnh hiệu quả hơn so với nhiều phương pháp trước đây. Nhờ kiến trúc này, LLM có thể theo dõi mối quan hệ giữa các phần khác nhau của đoạn văn, ngay cả khi chúng cách xa nhau.\n\n## Ứng dụng thực tế\n\nLLM đang được ứng dụng rộng rãi trong nhiều lĩnh vực:\n\n### 1. Giáo dục\nLLM có thể đóng vai trò như gia sư ảo, giải thích khái niệm, tạo câu hỏi ôn tập và giúp học sinh luyện viết.\n\n### 2. Doanh nghiệp\nNhiều công ty dùng LLM để tự động hóa chăm sóc khách hàng, phân tích phản hồi người dùng, soạn thảo tài liệu nội bộ và hỗ trợ ra quyết định.\n\n### 3. Công nghệ phần mềm\nLập trình viên có thể dùng LLM để viết code nhanh hơn, phát hiện lỗi, tạo test case và hiểu các đoạn mã phức tạp.\n\n### 4. Truyền thông và sáng tạo nội dung\nLLM giúp gợi ý ý tưởng, viết nháp bài viết, tạo tiêu đề, và hỗ trợ biên tập nội dung ở quy mô lớn.\n\n## Những thách thức còn tồn tại\n\nDù rất mạnh, LLM vẫn có nhiều hạn chế.\n\nMột vấn đề phổ biến là **ảo giác thông tin**: mô hình có thể tạo ra câu trả lời nghe rất hợp lý nhưng không chính xác. Ngoài ra, LLM còn có thể mang theo thiên lệch từ dữ liệu huấn luyện, dẫn đến phản hồi không công bằng hoặc thiếu khách quan.\n\nBên cạnh đó, việc sử dụng LLM trong thực tế cũng đặt ra các câu hỏi về:\n\n- Quyền riêng tư dữ liệu\n- Bản quyền nội dung\n- Minh bạch trong cách mô hình đưa ra quyết định\n- Tác động đến việc làm trong một số ngành nghề\n\n## Tương lai của LLM\n\nTrong tương lai, LLM có thể trở nên chính xác hơn, cá nhân hóa hơn và tích hợp sâu hơn vào các thiết bị hàng ngày. Chúng có thể không chỉ là công cụ trả lời câu hỏi, mà còn là hệ thống trợ lý thông minh có khả năng hiểu mục tiêu của người dùng và hỗ trợ chủ động hơn.\n\nTuy nhiên, để LLM phát triển bền vững, cần sự kết hợp giữa tiến bộ kỹ thuật, quản lý rủi ro và các nguyên tắc sử dụng có trách nhiệm.\n\n## Kết luận\n\nLLM là một trong những bước tiến đáng chú ý nhất của trí tuệ nhân tạo hiện đại. Với khả năng xử lý ngôn ngữ tự nhiên linh hoạt, chúng đang thay đổi cách con người học tập, làm việc và tương tác với công nghệ. Dù còn nhiều thách thức, tiềm năng mà LLM mang lại là rất lớn và chắc chắn sẽ tiếp tục định hình tương lai của AI trong nhiều năm tới.\n\n---\n\nNếu muốn, mình có thể viết tiếp cho bạn một phiên bản khác theo một trong các kiểu sau:\n- **bài báo học thuật**\n- **bài blog dễ hiểu**\n- **bài SEO**\n- **bài ngắn 300–500 từ**\n- **bài dài chuyên sâu về LLM**",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    }
+  ]
+}

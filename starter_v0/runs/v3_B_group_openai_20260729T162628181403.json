@@ -1,0 +1,940 @@
+{
+  "run_id": "v3_B_group_openai_20260729T162628181403",
+  "version": "v3",
+  "artifact_version": "v3+p7579fbd5d687+td5e86e3cde77",
+  "prompt_hash": "7579fbd5d687469ed499b524ed86cb3d429cc5c0bbb0855b7212e16fa8494f10",
+  "tools_hash": "d5e86e3cde77c7ddcc46badc5cd56b84a888f0c28fb31326b985b9ea2103c624",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openai",
+  "model": "gpt-5.4-mini",
+  "system_prompt": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "starter_v0\\data\\eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Bộ đánh giá 10 test case (5 single-turn + 5 multi-turn) cho Research Paper Agent với 6 tool: papers, paper_text, lookup, fetch, clarify, format.",
+  "generated_at": "2026-07-29T16:26:28",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 10,
+    "case_accuracy": 1.0,
+    "tool_routing_accuracy": 1.0,
+    "argument_accuracy": 1.0,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {},
+    "observed_mismatch_counts": {}
+  },
+  "results": [
+    {
+      "id": "G01_arxiv_papers_search",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Tìm kiếm paper arXiv với từ khóa và tham số max_results=3"
+      },
+      "input": "Tìm giúp mình 3 bài báo arXiv mới nhất về Retrieval Augmented Generation.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3,
+              "sort_by": "submittedDate"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Retrieval Augmented Generation",
+            "max_results": 3,
+            "sort_by": "submittedDate"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "query": "Retrieval Augmented Generation",
+            "api_query": "all:Retrieval AND all:Augmented AND all:Generation",
+            "total_results": 7918,
+            "items": [
+              {
+                "arxiv_id": "2607.25959v1",
+                "title": "Detecting Knowledge Inconsistencies Across Text, Tables, and Knowledge Graphs",
+                "summary": "Wikipedia and Wikidata are widely used for information access, LLM pre-training, and retrieval-augmented generation. Their knowledge is deeply connected but scattered across text, tables, and knowledge graphs. This raises a practical question: when these modalities disagree, how can we detect and explain the conflict? We study this problem as \\emph{modality-level inconsistency detection}. We first introduce a taxonomy of cross-modal knowledge inconsistencies, covering information granularity differences, direct conflicts, temporal changes, and KG incompleteness. We then present \\textsc{Kontrast}, an automatic framework that uses Text-to-SPARQL and LLM reasoning to compare table-based answers with KG evidence and categorize the resulting inconsistencies. Experiments on various Table-QA datasets show that cross-modal inconsistencies are common and informative. They reveal not only true knowledge conflicts, but also missing KG structure and temporal mismatches while being limited by Text-to-SPARQL errors and noise. Our analysis shows that text, tables, and KGs can complement and correct one another through systematic comparison. \\textsc{Kontrast} provides a practical tool for large-scale knowledge auditing and establishes a benchmark for future work on cross-modal knowledge consistency. Code and data are available at https://github.com/ECLADATTA/KONTRAST.",
+                "authors": [
+                  "Fanfu Wei",
+                  "Thibault Ehrhart",
+                  "Raphaël Troncy"
+                ],
+                "published": "2026-07-28T16:43:56Z",
+                "updated": "2026-07-28T16:43:56Z",
+                "url": "http://arxiv.org/abs/2607.25959v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.25959v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.CL",
+                "categories": [
+                  "cs.CL",
+                  "cs.AI"
+                ]
+              },
+              {
+                "arxiv_id": "2607.25600v1",
+                "title": "Beyond Self-Knowledge: Propagating Uncertainty Across Reasoning and Retrieval in LLMs",
+                "summary": "Retrieval-augmented generation improves knowledge-intensive question answering, but indiscriminate retrieval can introduce irrelevant evidence and unnecessary computation. We investigate whether verbalized confidence from black-box language models can serve as an actionable signal for retrieval routing. Our method, BeyondUncertainty, first elicits a structured provisional answer and confidence estimate, then applies a model-specific threshold selected on held-out validation data and frozen before test evaluation. Low-confidence questions receive top-$5$ TF--IDF retrieval followed by a second answer call, whereas high-confidence questions return the provisional answer directly. We evaluate 27,000 policy instances across six QA benchmarks, three model families, and three retrieval policies. BeyondUncertainty achieves $0.483$ mean token-level F1, compared with $0.467$ for always retrieval and $0.401$ for no retrieval, while reducing retrieved passages by $20.4\\%$ relative to always retrieval. When matched on the number of questions routed to retrieval within each dataset--model cell, it outperforms a post-hoc random allocation in 17 of 18 settings, with an average gain of 0.024 F1. Although poorly calibrated as an absolute probability, probe uncertainty modestly predicts question-level retrieval benefit (AUROC $=0.628$). However, the additional probe increases total token usage by $28.2\\%$, revealing a trade-off between more selective evidence acquisition and end-to-end token efficiency.",
+                "authors": [
+                  "Chandan Kumar Sah",
+                  "Xiaoli Lian",
+                  "Li Zhang"
+                ],
+                "published": "2026-07-28T11:30:25Z",
+                "updated": "2026-07-28T11:30:25Z",
+                "url": "http://arxiv.org/abs/2607.25600v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.25600v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.IR",
+                "categories": [
+                  "cs.IR",
+                  "cs.AI",
+                  "cs.CL"
+                ]
+              },
+              {
+                "arxiv_id": "2607.25346v1",
+                "title": "The Case Against Generation for Retrieval: Discriminative Language Models as Effective Retrievers",
+                "summary": "Large Language Models (LLMs) have emerged as powerful assets for recommender systems. However, deploying them as generative recommenders or zero-shot rankers at web-scale remains bottlenecked by prohibitive computational overhead and grounding challenges. In this paper, we revitalize the classic, highly efficient two-tower retrieval architecture by adapting LLMs as semantic representation backbones rather than generative engines. We introduce an LLM-native two-tower framework engineered for high-throughput, large-scale retrieval. Our architecture introduces several key innovations: a shared LLM encoder for joint user-item modeling, End-Of-Sentence (EOS) token pooling for compact sequence embedding, cross-dataset transfer learning, knowledge distillation from powerful cross-encoder teachers, and latent reasoning within the user tower. Extensive evaluation across three public benchmarks demonstrates that cross-encoder architecture outperforms current state-of-the-art (SoTA) models, while the efficient two-tower student achieves SoTA-comparable retrieval performance. Furthermore, experiments on internal large-scale production systems yield substantial topline retrieval improvements along with high resilience to model staleness and superior data scaling. Our findings demonstrate that when augmented with modern representation learning, the traditional two-tower paradigm remains an exceptionally competitive and practical solution for industrial retrieval systems.",
+                "authors": [
+                  "Zhe Xu",
+                  "Prachi Agrawal",
+                  "Kavosh Asadi",
+                  "Tianyi Chen",
+                  "Carl Hu",
+                  "Justin Johnson",
+                  "Wuwei Lan",
+                  "Mingfu Liang",
+                  "Xi Liu",
+                  "Tik On Lui",
+                  "Oladipo Ositelu",
+                  "Sandeep Pandey",
+                  "Ankit Peshin",
+                  "Feng Qi",
+                  "Anil Ramakrishna",
+                  "Kaushik Rangadurai",
+                  "Frank Shyu",
+                  "Luke Simon",
+                  "Yang Yang",
+                  "Chiyu Zhang"
+                ],
+                "published": "2026-07-28T06:47:53Z",
+                "updated": "2026-07-28T06:47:53Z",
+                "url": "http://arxiv.org/abs/2607.25346v1",
+                "pdf_url": "https://arxiv.org/pdf/2607.25346v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.IR",
+                "categories": [
+                  "cs.IR"
+                ]
+              }
+            ],
+            "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_arxiv_paper_text_read",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Đọc nội dung text bài báo arXiv với arxiv_url ID và max_pages=2"
+      },
+      "input": "Đọc chi tiết giúp mình bài báo arXiv có ID 1706.03762 (lấy 2 trang đầu).",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2,
+              "max_chars": 8000
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "paper_text",
+          "args": {
+            "arxiv_url": "1706.03762",
+            "max_pages": 2,
+            "max_chars": 8000
+          },
+          "result": {
+            "tool": "get_arxiv_paper_text",
+            "error": "RuntimeError",
+            "message": "Install pypdf first: pip install pypdf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_parallel_lookup_and_fetch",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Gọi song song lookup (tìm tin tức web) và fetch (đọc URL cụ thể)"
+      },
+      "input": "Tìm tin tức web mới nhất về model Claude 3.5 và tóm tắt link này: https://anthropic.com/news/claude",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5",
+              "topic": "news"
+            }
+          },
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5",
+              "topic": "news",
+              "timeframe": "week",
+              "max_results": 5
+            }
+          },
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "Claude 3.5",
+            "topic": "news",
+            "timeframe": "week",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "web_search",
+            "error": "RuntimeError",
+            "message": "Missing TAVILY_API_KEY env var"
+          }
+        },
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "https://anthropic.com/news/claude"
+          },
+          "result": {
+            "tool": "read_url",
+            "error": "RuntimeError",
+            "message": "Missing FIRECRAWL_API_KEY env var"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_clarify_missing_paper_url",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Thiếu thông tin link hoặc ID bài báo -> gọi clarify hỏi lại người dùng"
+      },
+      "input": "Tóm tắt giúp mình bài báo này",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn gửi giúp mình URL hoặc arXiv ID của bài báo cần tóm tắt nhé?",
+              "response_type": "text",
+              "options": []
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn gửi giúp mình URL hoặc arXiv ID của bài báo cần tóm tắt nhé?",
+            "response_type": "text",
+            "options": []
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn gửi giúp mình URL hoặc arXiv ID của bài báo cần tóm tắt nhé?",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_out_of_scope_math",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Câu hỏi giải toán ngoài phạm vi tra cứu bài báo -> từ chối, không gọi tool"
+      },
+      "input": "Tính giúp mình tích phân từ 0 đến 1 của x^3 dx",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Xin lỗi, mình không hỗ trợ giải bài toán toán học trong phiên này.  \nNếu bạn muốn, mình có thể giúp bạn tra cứu tài liệu/paper liên quan đến tích phân hoặc giải tích, hoặc tìm nguồn học thuật về chủ đề đó.",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G06_multiturn_clarify_then_papers",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: tổng hợp query ở turn 2 và max_results=5 ở turn 3 để gọi papers"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm cho mình một số bài báo khoa học mới"
+        },
+        {
+          "role": "user",
+          "content": "Về chủ đề Graph Neural Networks nhé"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 5 bài báo arXiv tốt nhất"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5,
+              "sort_by": "relevance"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Graph Neural Networks",
+            "max_results": 5,
+            "sort_by": "relevance"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "query": "Graph Neural Networks",
+            "api_query": "all:Graph AND all:Neural AND all:Networks",
+            "total_results": 18738,
+            "items": [
+              {
+                "arxiv_id": "2211.12792v2",
+                "title": "MECCH: Metapath Context Convolution-based Heterogeneous Graph Neural Networks",
+                "summary": "Heterogeneous graph neural networks (HGNNs) were proposed for representation learning on structural data with multiple types of nodes and edges. To deal with the performance degradation issue when HGNNs become deep, researchers combine metapaths into HGNNs to associate nodes closely related in semantics but far apart in the graph. However, existing metapath-based models suffer from either information loss or high computation costs. To address these problems, we present a novel Metapath Context Convolution-based Heterogeneous Graph Neural Network (MECCH). MECCH leverages metapath contexts, a new kind of graph structure that facilitates lossless node information aggregation while avoiding any redundancy. Specifically, MECCH applies three novel components after feature preprocessing to extract comprehensive information from the input graph efficiently: (1) metapath context construction, (2) metapath context encoder, and (3) convolutional metapath fusion. Experiments on five real-world heterogeneous graph datasets for node classification and link prediction show that MECCH achieves superior prediction accuracy compared with state-of-the-art baselines with improved computational efficiency.",
+                "authors": [
+                  "Xinyu Fu",
+                  "Irwin King"
+                ],
+                "published": "2022-11-23T09:13:33Z",
+                "updated": "2023-11-23T16:13:10Z",
+                "url": "http://arxiv.org/abs/2211.12792v2",
+                "pdf_url": "https://arxiv.org/pdf/2211.12792v2",
+                "source": "arxiv.org",
+                "primary_category": "cs.LG",
+                "categories": [
+                  "cs.LG"
+                ]
+              },
+              {
+                "arxiv_id": "2506.22084v1",
+                "title": "Transformers are Graph Neural Networks",
+                "summary": "We establish connections between the Transformer architecture, originally introduced for natural language processing, and Graph Neural Networks (GNNs) for representation learning on graphs. We show how Transformers can be viewed as message passing GNNs operating on fully connected graphs of tokens, where the self-attention mechanism capture the relative importance of all tokens w.r.t. each-other, and positional encodings provide hints about sequential ordering or structure. Thus, Transformers are expressive set processing networks that learn relationships among input elements without being constrained by apriori graphs. Despite this mathematical connection to GNNs, Transformers are implemented via dense matrix operations that are significantly more efficient on modern hardware than sparse message passing. This leads to the perspective that Transformers are GNNs currently winning the hardware lottery.",
+                "authors": [
+                  "Chaitanya K. Joshi"
+                ],
+                "published": "2025-06-27T10:15:33Z",
+                "updated": "2025-06-27T10:15:33Z",
+                "url": "http://arxiv.org/abs/2506.22084v1",
+                "pdf_url": "https://arxiv.org/pdf/2506.22084v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.LG",
+                "categories": [
+                  "cs.LG",
+                  "cs.AI"
+                ]
+              },
+              {
+                "arxiv_id": "1911.08941v1",
+                "title": "Fast and Deep Graph Neural Networks",
+                "summary": "We address the efficiency issue for the construction of a deep graph neural network (GNN). The approach exploits the idea of representing each input graph as a fixed point of a dynamical system (implemented through a recurrent neural network), and leverages a deep architectural organization of the recurrent units. Efficiency is gained by many aspects, including the use of small and very sparse networks, where the weights of the recurrent units are left untrained under the stability condition introduced in this work. This can be viewed as a way to study the intrinsic power of the architecture of a deep GNN, and also to provide insights for the set-up of more complex fully-trained models. Through experimental results, we show that even without training of the recurrent connections, the architecture of small deep GNN is surprisingly able to achieve or improve the state-of-the-art performance on a significant set of tasks in the field of graphs classification.",
+                "authors": [
+                  "Claudio Gallicchio",
+                  "Alessio Micheli"
+                ],
+                "published": "2019-11-20T14:46:54Z",
+                "updated": "2019-11-20T14:46:54Z",
+                "url": "http://arxiv.org/abs/1911.08941v1",
+                "pdf_url": "https://arxiv.org/pdf/1911.08941v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.LG",
+                "categories": [
+                  "cs.LG",
+                  "math.DS",
+                  "stat.ML"
+                ]
+              },
+              {
+                "arxiv_id": "2512.13410v1",
+                "title": "Multiclass Graph-Based Large Margin Classifiers: Unified Approach for Support Vectors and Neural Networks",
+                "summary": "While large margin classifiers are originally an outcome of an optimization framework, support vectors (SVs) can be obtained from geometric approaches. This article presents advances in the use of Gabriel graphs (GGs) in binary and multiclass classification problems. For Chipclass, a hyperparameter-less and optimization-less GG-based binary classifier, we discuss how activation functions and support edge (SE)-centered neurons affect the classification, proposing smoother functions and structural SV (SSV)-centered neurons to achieve margins with low probabilities and smoother classification contours. We extend the neural network architecture, which can be trained with backpropagation with a softmax function and a cross-entropy loss, or by solving a system of linear equations. A new subgraph-/distance-based membership function for graph regularization is also proposed, along with a new GG recomputation algorithm that is less computationally expensive than the standard approach. Experimental results with the Friedman test show that our method was better than previous GG-based classifiers and statistically equivalent to tree-based models.",
+                "authors": [
+                  "Vítor M. Hanriot",
+                  "Luiz C. B. Torres",
+                  "Antônio P. Braga"
+                ],
+                "published": "2025-12-15T15:00:13Z",
+                "updated": "2025-12-15T15:00:13Z",
+                "url": "http://arxiv.org/abs/2512.13410v1",
+                "pdf_url": "https://arxiv.org/pdf/2512.13410v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.LG",
+                "categories": [
+                  "cs.LG",
+                  "stat.ML"
+                ]
+              },
+              {
+                "arxiv_id": "2206.13211v2",
+                "title": "Modern graph neural networks do worse than classical greedy algorithms in solving combinatorial optimization problems like maximum independent set",
+                "summary": "The recent work ``Combinatorial Optimization with Physics-Inspired Graph Neural Networks'' [Nat Mach Intell 4 (2022) 367] introduces a physics-inspired unsupervised Graph Neural Network (GNN) to solve combinatorial optimization problems on sparse graphs. To test the performances of these GNNs, the authors of the work show numerical results for two fundamental problems: maximum cut and maximum independent set (MIS). They conclude that \"the graph neural network optimizer performs on par or outperforms existing solvers, with the ability to scale beyond the state of the art to problems with millions of variables.\" In this comment, we show that a simple greedy algorithm, running in almost linear time, can find solutions for the MIS problem of much better quality than the GNN. The greedy algorithm is faster by a factor of $10^4$ with respect to the GNN for problems with a million variables. We do not see any good reason for solving the MIS with these GNN, as well as for using a sledgehammer to crack nuts. In general, many claims of superiority of neural networks in solving combinatorial problems are at risk of being not solid enough, since we lack standard benchmarks based on really hard problems. We propose one of such hard benchmarks, and we hope to see future neural network optimizers tested on these problems before any claim of superiority is made.",
+                "authors": [
+                  "Maria Chiara Angelini",
+                  "Federico Ricci-Tersenghi"
+                ],
+                "published": "2022-06-27T11:54:01Z",
+                "updated": "2023-01-02T21:41:14Z",
+                "url": "http://arxiv.org/abs/2206.13211v2",
+                "pdf_url": "https://arxiv.org/pdf/2206.13211v2",
+                "source": "arxiv.org",
+                "primary_category": "cs.LG",
+                "categories": [
+                  "cs.LG",
+                  "cond-mat.dis-nn",
+                  "cs.AI",
+                  "math.OC"
+                ]
+              }
+            ],
+            "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_multiturn_clarify_url_then_paper_text",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: nhận arxiv_url từ turn 2 và max_pages=3 từ turn 3 để gọi paper_text"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đọc nội dung bài báo arXiv này giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "ID là 2303.08774"
+        },
+        {
+          "role": "user",
+          "content": "Đọc 3 trang đầu thôi nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3,
+              "max_chars": 8000
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "paper_text",
+          "args": {
+            "arxiv_url": "2303.08774",
+            "max_pages": 3,
+            "max_chars": 8000
+          },
+          "result": {
+            "tool": "get_arxiv_paper_text",
+            "error": "RuntimeError",
+            "message": "Install pypdf first: pip install pypdf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_multiturn_switch_web_to_arxiv",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: đổi từ tìm web sang papers (arXiv) giữ nguyên query"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm trên web thông tin về AI Agent"
+        },
+        {
+          "role": "user",
+          "content": "Thôi bỏ web đi, tìm bài báo chính thức trên arXiv"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn chủ đề AI Agent nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent",
+              "max_results": 5,
+              "sort_by": "relevance"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "AI Agent",
+            "max_results": 5,
+            "sort_by": "relevance"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "query": "AI Agent",
+            "api_query": "all:AI AND all:Agent",
+            "total_results": 11072,
+            "items": [
+              {
+                "arxiv_id": "2503.12687v1",
+                "title": "AI Agents: Evolution, Architecture, and Real-World Applications",
+                "summary": "This paper examines the evolution, architecture, and practical applications of AI agents from their early, rule-based incarnations to modern sophisticated systems that integrate large language models with dedicated modules for perception, planning, and tool use. Emphasizing both theoretical foundations and real-world deployments, the paper reviews key agent paradigms, discusses limitations of current evaluation benchmarks, and proposes a holistic evaluation framework that balances task effectiveness, efficiency, robustness, and safety. Applications across enterprise, personal assistance, and specialized domains are analyzed, with insights into future research directions for more resilient and adaptive AI agent systems.",
+                "authors": [
+                  "Naveen Krishnan"
+                ],
+                "published": "2025-03-16T23:07:48Z",
+                "updated": "2025-03-16T23:07:48Z",
+                "url": "http://arxiv.org/abs/2503.12687v1",
+                "pdf_url": "https://arxiv.org/pdf/2503.12687v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.AI",
+                "categories": [
+                  "cs.AI"
+                ]
+              },
+              {
+                "arxiv_id": "2605.23989v1",
+                "title": "Towards trustworthy agentic AI: a comprehensive survey of safety, robustness, privacy, and system security",
+                "summary": "Agentic AI systems -- Large Language Models (LLMs) augmented with planning, tool use, memory, and long-horizon interactions -- can execute complex tasks autonomously, but their multi-step trajectories introduce new failure modes that challenge trustworthiness. This survey provides a focused examination of trustworthy agentic AI through two core dimensions that are critical for high-risk deployments: Safety and Robustness, and Privacy and System Security. For each dimension, we clarify key concepts, identify where risks emerge along the agent workflow, and summarize stage-targeted mitigation strategies. Other trustworthiness aspects (value alignment, transparency, fairness, and accountability) are discussed as relevant context rather than parallel chapters. To support consistent comparison and deployment decisions, we consolidate evaluation into a unified metrics-and-benchmarks hub, emphasizing both outcome and process signals (e.g., constraint violations, trace completeness, and adversarial success rates) and offering scenario-to-metric guidance for release gating. We conclude by outlining open challenges such as self-evolving agents, runtime monitoring and verification, privacy-preserving personalization, and the trust-utility trade-off, and present a case study of real-world security failures in open-source agentic systems. Our goal is to serve as a practical reference for researchers and practitioners building trustworthy agentic systems in high-stakes environments.",
+                "authors": [
+                  "Jinhu Qi",
+                  "Muzhi Li",
+                  "Jiahong Liu",
+                  "Yuqin Shu",
+                  "Dianzhi Yu",
+                  "Shicheng Ma",
+                  "Wenqian Cui",
+                  "Yiyang Zhao",
+                  "Yiyi Chen",
+                  "Ruoxi Jiang",
+                  "Irwin King",
+                  "Zenglin Xu"
+                ],
+                "published": "2026-05-17T10:26:37Z",
+                "updated": "2026-05-17T10:26:37Z",
+                "url": "http://arxiv.org/abs/2605.23989v1",
+                "pdf_url": "https://arxiv.org/pdf/2605.23989v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.AI",
+                "categories": [
+                  "cs.AI",
+                  "cs.CL",
+                  "cs.CR"
+                ]
+              },
+              {
+                "arxiv_id": "2601.00360v3",
+                "title": "Mapping Human Anti-collusion Mechanisms to Multi-agent AI Systems",
+                "summary": "As multi-agent AI systems become increasingly autonomous, evidence shows they can develop collusive strategies similar to those long observed in human markets and institutions. While human domains have accumulated centuries of anti-collusion mechanisms, it remains unclear how these can be adapted to AI settings. This paper addresses that gap by (i) developing a taxonomy of human anti-collusion mechanisms, including sanctions, leniency & whistleblowing, monitoring & auditing, market design, and governance and (ii) mapping them to potential interventions for multi-agent AI systems. For each mechanism, we propose implementation approaches. We also highlight open challenges, such as the attribution problem (difficulty attributing emergent coordination to specific agents), identity fluidity (agents being easily forked or modified), the boundary problem (distinguishing beneficial cooperation from harmful collusion), and adversarial adaptation (agents learning to evade detection).",
+                "authors": [
+                  "Jamiu Idowu",
+                  "Ahmed Almasoud",
+                  "Ayman Alfahid"
+                ],
+                "published": "2026-01-01T14:30:37Z",
+                "updated": "2026-05-18T12:03:54Z",
+                "url": "http://arxiv.org/abs/2601.00360v3",
+                "pdf_url": "https://arxiv.org/pdf/2601.00360v3",
+                "source": "arxiv.org",
+                "primary_category": "cs.MA",
+                "categories": [
+                  "cs.MA",
+                  "cs.AI",
+                  "cs.CY"
+                ]
+              },
+              {
+                "arxiv_id": "2605.21825v1",
+                "title": "Toward AI VIS Co-Scientists: A General and End-to-End Agent Harness for Solving Complex Data Visualization Tasks",
+                "summary": "The ability to inspect, interpret, and communicate complex data is crucial for virtually any scientific endeavor, but often requires significant expertise outside the core domain ranging from data management and analysis to visualization design and implementation. We present an end-to-end agentic harness that, based on only the data and a high level description of the tasks, independently designs custom visual analysis applications (VIS apps). This represents an important step towards a general AI co-scientist envisioned by many as an autonomous system that can autonomously execute long horizon tasks based on high-level directions. Our proposed VIS co-scientist is an essential component of this broader AI co-scientist vision: a harness that can autonomously analyze data and design visualization solutions using a collection of agents and specialized skills that coordinate exploratory analysis, plan, configure the environment, implement, validate the interface, and most importantly evaluate the overall task completion. Each stage produces document and instruction artifacts that guide downstream work and enable iterative refinement. We validate this approach on IEEE SciVis Contests spanning multiple science and engineering fields. These contests serve as ideal proving grounds because they encode real-world complexity: ambiguous requirements, diverse data modalities, design trade-offs, and task-driven validation. Given only the data and target tasks, our system autonomously produces functional single-page VIS Apps with verified linked-view behavior, highly customized to domain experts' specified tasks and needs.",
+                "authors": [
+                  "Haichao Miao",
+                  "Zhimin Li",
+                  "Kuangshi Ai",
+                  "Kaiyuan Tang",
+                  "Chaoli Wang",
+                  "Peer-Timo Bremer",
+                  "Shusen Liu"
+                ],
+                "published": "2026-05-20T23:49:28Z",
+                "updated": "2026-05-20T23:49:28Z",
+                "url": "http://arxiv.org/abs/2605.21825v1",
+                "pdf_url": "https://arxiv.org/pdf/2605.21825v1",
+                "source": "arxiv.org",
+                "primary_category": "cs.AI",
+                "categories": [
+                  "cs.AI",
+                  "cs.HC"
+                ]
+              },
+              {
+                "arxiv_id": "2112.01298v2",
+                "title": "Meaningful human control: actionable properties for AI system development",
+                "summary": "How can humans remain in control of artificial intelligence (AI)-based systems designed to perform tasks autonomously? Such systems are increasingly ubiquitous, creating benefits - but also undesirable situations where moral responsibility for their actions cannot be properly attributed to any particular person or group. The concept of meaningful human control has been proposed to address responsibility gaps and mitigate them by establishing conditions that enable a proper attribution of responsibility for humans; however, clear requirements for researchers, designers, and engineers are yet inexistent, making the development of AI-based systems that remain under meaningful human control challenging. In this paper, we address the gap between philosophical theory and engineering practice by identifying, through an iterative process of abductive thinking, four actionable properties for AI-based systems under meaningful human control, which we discuss making use of two applications scenarios: automated vehicles and AI-based hiring. First, a system in which humans and AI algorithms interact should have an explicitly defined domain of morally loaded situations within which the system ought to operate. Second, humans and AI agents within the system should have appropriate and mutually compatible representations. Third, responsibility attributed to a human should be commensurate with that human's ability and authority to control the system. Fourth, there should be explicit links between the actions of the AI agents and actions of humans who are aware of their moral responsibility. We argue that these four properties will support practically-minded professionals to take concrete steps toward designing and engineering for AI systems that facilitate meaningful human control.",
+                "authors": [
+                  "Luciano Cavalcante Siebert",
+                  "Maria Luce Lupetti",
+                  "Evgeni Aizenberg",
+                  "Niek Beckers",
+                  "Arkady Zgonnikov",
+                  "Herman Veluwenkamp",
+                  "David Abbink",
+                  "Elisa Giaccardi",
+                  "Geert-Jan Houben",
+                  "Catholijn M. Jonker",
+                  "Jeroen van den Hoven",
+                  "Deborah Forster",
+                  "Reginald L. Lagendijk"
+                ],
+                "published": "2021-11-25T11:05:37Z",
+                "updated": "2022-05-19T15:28:01Z",
+                "url": "http://arxiv.org/abs/2112.01298v2",
+                "pdf_url": "https://arxiv.org/pdf/2112.01298v2",
+                "source": "arxiv.org",
+                "primary_category": "cs.CY",
+                "categories": [
+                  "cs.CY",
+                  "cs.AI"
+                ]
+              }
+            ],
+            "rate_limit_note": "arXiv may return 429 if called too frequently; this tool waits at least 3 seconds between requests in-process."
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_multiturn_format_digest",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu trình bày bản tin (digest) chọn template=brief"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm 3 bài báo về Transformer"
+        },
+        {
+          "role": "user",
+          "content": "Tổng hợp các bài báo vừa tìm thành bản tin digest"
+        },
+        {
+          "role": "user",
+          "content": "Dùng template brief nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "template": "brief"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "items": [],
+              "template": "brief",
+              "headline": "Bản tin digest về Transformer"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "items": [],
+            "template": "brief",
+            "headline": "Bản tin digest về Transformer"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "brief",
+            "markdown": "**Bản tin digest về Transformer**\n\n",
+            "item_count": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_multiturn_no_tool_meta",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: hỏi khả năng meta ở turn cuối -> không gọi tool"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm bài báo arXiv về LLM"
+        },
+        {
+          "role": "user",
+          "content": "Cảm ơn bạn, mình đã đọc xong rồi"
+        },
+        {
+          "role": "user",
+          "content": "Bạn có thể tự viết một bài báo mới cho mình không?"
+        }
+      ],
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Mình không thể tự viết một bài báo hoàn chỉnh thay bạn.\n\nNhưng mình có thể hỗ trợ rất tốt ở các phần liên quan, ví dụ:\n- tìm và tổng hợp tài liệu liên quan\n- đề xuất chủ đề và câu hỏi nghiên cứu\n- lập dàn ý bài báo\n- viết phần mở đầu, related work, phương pháp, kết quả\n- chỉnh sửa ngôn ngữ, logic, và cấu trúc bản thảo\n\nNếu bạn muốn, hãy cho mình:\n1. chủ đề nghiên cứu  \n2. mục tiêu bài báo  \n3. độ dài mong muốn  \n4. ngôn ngữ viết  \n\nMình sẽ giúp bạn dựng ngay một dàn ý hoặc bản nháp ban đầu.",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    }
+  ]
+}

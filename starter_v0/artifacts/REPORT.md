@@ -6,9 +6,9 @@
 
 ## Team
 
-- Team:
-- Members:
-- Provider/model:
+- Team: DAY04_2A202601474_NguyenPhuongDong
+- Members: Nguyễn Phương Đông
+- Provider/model: openai / gpt-5.4-mini (local proxy)
 
 ---
 
@@ -16,41 +16,40 @@
 
 ## A1. Agent này làm được gì
 
-> 1–2 câu mô tả agent dùng để làm gì.
-
-Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc URL và tổng hợp thành digest."
+Research Paper Agent: tìm kiếm bài báo arXiv theo chủ đề, đọc nội dung PDF paper theo arXiv ID, tìm tin tức web, đọc URL bất kỳ, trích xuất hình ảnh/biểu đồ từ paper arXiv, và trình bày kết quả thành digest markdown. Agent hỏi lại khi thiếu thông tin và từ chối các yêu cầu ngoài phạm vi research.
 
 **Link dùng thử (truy cập được trong showdown):**
 
-> Dán public URL nếu người khác cần mở từ máy riêng; localhost cũng được nếu demo trực tiếp trên máy trình chiếu. Streamlit được khuyến nghị, nhưng nhóm có thể dùng bất kỳ framework nào.
->
-> URL:
+> URL: http://localhost:8501 (Streamlit, chạy `streamlit run app.py` trên máy demo)
 
 ## A2. Tool agent có
 
-> Liệt kê các tool agent đang dùng. Mỗi tool 1 dòng: tên + làm được gì.
-
 | Tên tool | Làm được gì | Tool mới nhóm thêm? |
 |---|---|---|
-| clarify | hỏi lại người dùng khi thiếu thông tin | không |
-|  |  |  |
-|  |  |  |
+| clarify | Hỏi lại người dùng khi thiếu arXiv ID, URL hoặc topic; xác nhận trước hành động nhạy cảm | không |
+| papers | Tìm kiếm bài báo trên arXiv theo từ khóa, sắp xếp theo relevance hoặc ngày đăng | không |
+| paper_text | Tải PDF arXiv và trích text theo số trang hoặc số ký tự | không |
+| lookup | Tìm kiếm tin tức / thông tin chung trên web với bộ lọc topic và timeframe | không |
+| fetch | Đọc và tóm tắt nội dung một URL cụ thể (không phải arXiv) | không |
+| format | Trình bày danh sách kết quả thành digest markdown theo template (brief/sections/bullets/thread/daily_ai_vn) | không |
+| download_figure | Trích xuất hình ảnh, biểu đồ, bảng kết quả từ PDF bài báo arXiv thành file PNG | **CÓ — tool mới của nhóm** |
 
 ## A3. Câu hỏi mẫu để thử
 
-> 3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
-
-1.
-2.
-3.
+1. `Tìm giúp mình 5 bài báo arXiv mới nhất về Retrieval Augmented Generation.`
+2. `Đọc nội dung bài báo arXiv 1706.03762, lấy 3 trang đầu.`
+3. `Tìm tin tức web hôm nay về model Gemini 2.0 và tóm tắt link này: https://deepmind.google/technologies/gemini/`
+4. `Tổng hợp các bài báo vừa tìm thành digest, dùng template brief.`
+5. `Trích xuất hình ảnh kết quả từ paper arXiv 2303.08774.`
 
 ## A4. Kịch bản demo đã rehearse
 
-> Chuẩn bị 3–5 scenario. Mỗi scenario cần cho thấy tool đã làm gì và một thay đổi cụ thể giữa các version.
-
 | Scenario | Tool trace cần thấy | Câu chuyện cải thiện version | Fallback run/transcript |
 |---|---|---|---|
-|  |  |  |  |
+| Tìm paper RAG + đọc paper cụ thể | `papers(query="RAG", max_results=3)` → `paper_text(arxiv_url="...", max_pages=2)` | v0 thiếu routing table → v1 thêm decision table → v3 pass 100% | v3_B_group_openai_20260729T162628181403.json |
+| Compound request: web + URL | `lookup(query="Claude 3.5", topic="news")` + `fetch(url="...")` song song | v1 chỉ gọi fetch bỏ lookup → v2 thêm Hard URL rule → v3 pass G03 | v3_B_group_openai_20260729T162628181403.json |
+| Format digest sau khi tìm paper | `format(template="brief")` từ prior results | v1 gọi `clarify` thay vì `format` → v2 thêm rule format → v3 pass G09 | v3_B_group_openai_20260729T162628181403.json |
+| Trích hình ảnh từ paper arXiv | `download_figure(arxiv_url="2303.08774", max_images=4)` | Tool mới của nhóm; demo live extraction từ PDF | runs/v3_B_group_openai_20260729T162628181403.json |
 
 ---
 

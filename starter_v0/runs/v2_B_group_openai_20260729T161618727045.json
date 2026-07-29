@@ -1,0 +1,621 @@
+{
+  "run_id": "v2_B_group_openai_20260729T161618727045",
+  "version": "v2",
+  "artifact_version": "v2+pa98197a9d7b1+t43ea2cbf8b23",
+  "prompt_hash": "a98197a9d7b10de3a69eacfdee3dca7124e51ef31b8f415e3a5c268ef7432459",
+  "tools_hash": "43ea2cbf8b23178efa46debc582a05eb4c600ba521a0ec3cb43ff54232990275",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openai",
+  "model": "gpt-5.4-mini",
+  "system_prompt": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\labs4\\DAY04_2A202601474_NguyenPhuongDong\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Bộ đánh giá 10 test case (5 single-turn + 5 multi-turn) cho Research Paper Agent với 6 tool: papers, paper_text, lookup, fetch, clarify, format.",
+  "generated_at": "2026-07-29T16:16:18",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 9,
+    "case_accuracy": 0.9,
+    "tool_routing_accuracy": 0.9,
+    "argument_accuracy": 0.9,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {
+      "wrong_tool": 1
+    },
+    "observed_mismatch_counts": {
+      "missing_tool_call": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_arxiv_papers_search",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Tìm kiếm paper arXiv với từ khóa và tham số max_results=3"
+      },
+      "input": "Tìm giúp mình 3 bài báo arXiv mới nhất về Retrieval Augmented Generation.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3,
+              "sort_by": "submittedDate"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Retrieval Augmented Generation",
+            "max_results": 3,
+            "sort_by": "submittedDate"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='export.arxiv.org', port=443): Max retries exceeded with url: /api/query?search_query=all%3ARetrieval+AND+all%3AAugmented+AND+all%3AGeneration&max_results=3&sortBy=submittedDate&sortOrder=descending (Caused by NewConnectionError(\"HTTPSConnection(host='export.arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_arxiv_paper_text_read",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Đọc nội dung text bài báo arXiv với arxiv_url ID và max_pages=2"
+      },
+      "input": "Đọc chi tiết giúp mình bài báo arXiv có ID 1706.03762 (lấy 2 trang đầu).",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2,
+              "max_chars": 8000
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "paper_text",
+          "args": {
+            "arxiv_url": "1706.03762",
+            "max_pages": 2,
+            "max_chars": 8000
+          },
+          "result": {
+            "tool": "get_arxiv_paper_text",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='arxiv.org', port=443): Max retries exceeded with url: /pdf/1706.03762.pdf (Caused by NewConnectionError(\"HTTPSConnection(host='arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_parallel_lookup_and_fetch",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Gọi song song lookup (tìm tin tức web) và fetch (đọc URL cụ thể)"
+      },
+      "input": "Tìm tin tức web mới nhất về model Claude 3.5 và tóm tắt link này: https://anthropic.com/news/claude",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5",
+              "topic": "news"
+            }
+          },
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5",
+              "topic": "news",
+              "timeframe": "month",
+              "max_results": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call fetch"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "Claude 3.5",
+            "topic": "news",
+            "timeframe": "month",
+            "max_results": 5
+          },
+          "result": {
+            "tool": "web_search",
+            "error": "RuntimeError",
+            "message": "Missing TAVILY_API_KEY env var"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_clarify_missing_paper_url",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Thiếu thông tin link hoặc ID bài báo -> gọi clarify hỏi lại người dùng"
+      },
+      "input": "Tóm tắt giúp mình bài báo này",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn gửi giúp mình link hoặc arXiv ID của bài báo cần tóm tắt nhé?",
+              "response_type": "text",
+              "options": []
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn gửi giúp mình link hoặc arXiv ID của bài báo cần tóm tắt nhé?",
+            "response_type": "text",
+            "options": []
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn gửi giúp mình link hoặc arXiv ID của bài báo cần tóm tắt nhé?",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_out_of_scope_math",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Câu hỏi giải toán ngoài phạm vi tra cứu bài báo -> từ chối, không gọi tool"
+      },
+      "input": "Tính giúp mình tích phân từ 0 đến 1 của x^3 dx",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Mình chỉ hỗ trợ tìm kiếm, đọc và tóm tắt bài báo/tài liệu nghiên cứu, nên không giải bài tích phân này được.\n\nNếu bạn muốn, mình có thể giúp bạn:\n- tìm paper về giải tích hoặc tích phân,\n- đọc và tóm tắt một bài viết bạn gửi,\n- hoặc tra cứu tài liệu học toán trên web.",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G06_multiturn_clarify_then_papers",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: tổng hợp query ở turn 2 và max_results=5 ở turn 3 để gọi papers"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm cho mình một số bài báo khoa học mới"
+        },
+        {
+          "role": "user",
+          "content": "Về chủ đề Graph Neural Networks nhé"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 5 bài báo arXiv tốt nhất"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5,
+              "sort_by": "relevance"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "Graph Neural Networks",
+            "max_results": 5,
+            "sort_by": "relevance"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='export.arxiv.org', port=443): Max retries exceeded with url: /api/query?search_query=all%3AGraph+AND+all%3ANeural+AND+all%3ANetworks&max_results=5&sortBy=relevance&sortOrder=descending (Caused by NewConnectionError(\"HTTPSConnection(host='export.arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_multiturn_clarify_url_then_paper_text",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: nhận arxiv_url từ turn 2 và max_pages=3 từ turn 3 để gọi paper_text"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đọc nội dung bài báo arXiv này giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "ID là 2303.08774"
+        },
+        {
+          "role": "user",
+          "content": "Đọc 3 trang đầu thôi nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3,
+              "max_chars": 8000
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "paper_text",
+          "args": {
+            "arxiv_url": "2303.08774",
+            "max_pages": 3,
+            "max_chars": 8000
+          },
+          "result": {
+            "tool": "get_arxiv_paper_text",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='arxiv.org', port=443): Max retries exceeded with url: /pdf/2303.08774.pdf (Caused by NewConnectionError(\"HTTPSConnection(host='arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_multiturn_switch_web_to_arxiv",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: đổi từ tìm web sang papers (arXiv) giữ nguyên query"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm trên web thông tin về AI Agent"
+        },
+        {
+          "role": "user",
+          "content": "Thôi bỏ web đi, tìm bài báo chính thức trên arXiv"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn chủ đề AI Agent nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent",
+              "max_results": 5,
+              "sort_by": "relevance"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "papers",
+          "args": {
+            "query": "AI Agent",
+            "max_results": 5,
+            "sort_by": "relevance"
+          },
+          "result": {
+            "tool": "arxiv_search",
+            "error": "ConnectionError",
+            "message": "HTTPSConnectionPool(host='export.arxiv.org', port=443): Max retries exceeded with url: /api/query?search_query=all%3AAI+AND+all%3AAgent&max_results=5&sortBy=relevance&sortOrder=descending (Caused by NewConnectionError(\"HTTPSConnection(host='export.arxiv.org', port=443): Failed to establish a new connection: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions\"))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_multiturn_format_digest",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu trình bày bản tin (digest) chọn template=brief"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm 3 bài báo về Transformer"
+        },
+        {
+          "role": "user",
+          "content": "Tổng hợp các bài báo vừa tìm thành bản tin digest"
+        },
+        {
+          "role": "user",
+          "content": "Dùng template brief nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "template": "brief"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "items": [],
+              "template": "brief",
+              "headline": "Bản tin digest về Transformer"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "items": [],
+            "template": "brief",
+            "headline": "Bản tin digest về Transformer"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "brief",
+            "markdown": "**Bản tin digest về Transformer**\n\n",
+            "item_count": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_multiturn_no_tool_meta",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Multi-turn: hỏi khả năng meta ở turn cuối -> không gọi tool"
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm bài báo arXiv về LLM"
+        },
+        {
+          "role": "user",
+          "content": "Cảm ơn bạn, mình đã đọc xong rồi"
+        },
+        {
+          "role": "user",
+          "content": "Bạn có thể tự viết một bài báo mới cho mình không?"
+        }
+      ],
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Mình không thể tự viết trọn một bài báo hoàn chỉnh thay bạn.\n\nNhưng mình có thể hỗ trợ rất tốt ở các phần sau:\n- chọn đề tài và câu hỏi nghiên cứu\n- lập dàn ý bài báo\n- viết tiêu đề, abstract, introduction\n- gợi ý related work và cấu trúc thí nghiệm\n- chỉnh sửa bản thảo bạn đã viết\n- tóm tắt và trích ý từ các paper liên quan\n\nNếu bạn muốn, mình có thể giúp bạn **lên một đề cương bài báo mới về LLM** ngay bây giờ.",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    }
+  ]
+}
