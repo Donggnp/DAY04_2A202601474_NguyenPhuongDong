@@ -116,3 +116,14 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  # ---------------- Team tool ----------------
+  - name: download_figure
+    description: "Trích hình/bảng biểu của một bài báo arXiv thành ảnh PNG."
+    parameters:
+      type: object
+      properties:
+        arxiv_url: {type: string, default: "", description: "ID hoặc địa chỉ"}
+        max_images: {type: integer, default: 6, description: "Số ảnh tối đa"}
+        dpi: {type: integer, default: 150, description: "Độ phân giải ảnh trang bảng biểu"}
+      required: [arxiv_url]

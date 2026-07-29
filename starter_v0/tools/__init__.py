@@ -10,6 +10,7 @@ import yaml
 from .clarify.tool import ask_user
 from .papers.tool import arxiv_search
 from .paper_text.tool import get_arxiv_paper_text
+from .download_figure.tool import download_figure
 from .timeline.tool import get_user_tweets
 from .fetch.tool import read_url
 from .format.tool import render_digest
@@ -35,6 +36,7 @@ TOOL_FUNCTIONS = {
     "policy": search_company_policy,
     "papers": arxiv_search,
     "paper_text": get_arxiv_paper_text,
+    "download_figure": download_figure,
 }
 
 
