@@ -7,10 +7,10 @@
 ## Team
 
 - Team: DAY04_2A202601474_NguyenPhuongDong
-- Members: Nguyễn Phương Đông - 2A202601474 - role
-            Trần Thị Kiều Trang - 2A202601498 - role
-            Nguyễn Quý Dùng - 2A202601200 - role
-            Nguyễn Nhật Minh - 2A202601950 - role
+- Members: Nguyễn Phương Đông - 2A202601474 - role UI/QA/Deployment
+            Trần Thị Kiều Trang - 2A202601498 - role Prompt & Eval Lead
+            Nguyễn Quý Dùng - 2A202601200 - role Backend/Agent Engineer
+            Nguyễn Nhật Minh - 2A202601950 - role Tool & Data Engineer
             
 - Provider/model: openai / gpt-4o-mini (local proxy)
 
