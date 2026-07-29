@@ -1,7 +1,279 @@
 {
   "dataset_id": "day04_v2_research_group",
   "dataset_role": "group",
-  "description": "Template để NHÓM tự viết đúng 10 case: 5 single-turn dùng query và 5 multi-turn dùng turns. Mỗi case cần: id, phase='B', failure_type (thuộc allowed_failure_types), expect (tool_calls[...] hoặc no_tool=true), và metadata.what_it_tests. File để trống có chủ đích vì mỗi nhóm phải tự thiết kế các case này.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "Bộ đánh giá 10 test case (5 single-turn + 5 multi-turn) cho Research Paper Agent với 6 tool: papers, paper_text, lookup, fetch, clarify, format.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_arxiv_papers_search",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm giúp mình 3 bài báo arXiv mới nhất về Retrieval Augmented Generation.",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Retrieval Augmented Generation",
+              "max_results": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Tìm kiếm paper arXiv với từ khóa và tham số max_results=3"
+      }
+    },
+    {
+      "id": "G02_arxiv_paper_text_read",
+      "phase": "B",
+      "suite": "group",
+      "query": "Đọc chi tiết giúp mình bài báo arXiv có ID 1706.03762 (lấy 2 trang đầu).",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762",
+              "max_pages": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Đọc nội dung text bài báo arXiv với arxiv_url ID và max_pages=2"
+      }
+    },
+    {
+      "id": "G03_parallel_lookup_and_fetch",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm tin tức web mới nhất về model Claude 3.5 và tóm tắt link này: https://anthropic.com/news/claude",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Claude 3.5",
+              "topic": "news"
+            }
+          },
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Gọi song song lookup (tìm tin tức web) và fetch (đọc URL cụ thể)"
+      }
+    },
+    {
+      "id": "G04_clarify_missing_paper_url",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tóm tắt giúp mình bài báo này",
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Thiếu thông tin link hoặc ID bài báo -> gọi clarify hỏi lại người dùng"
+      }
+    },
+    {
+      "id": "G05_out_of_scope_math",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tính giúp mình tích phân từ 0 đến 1 của x^3 dx",
+      "failure_type": "out_of_scope",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "metadata": {
+        "what_it_tests": "Câu hỏi giải toán ngoài phạm vi tra cứu bài báo -> từ chối, không gọi tool"
+      }
+    },
+    {
+      "id": "G06_multiturn_clarify_then_papers",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm cho mình một số bài báo khoa học mới"
+        },
+        {
+          "role": "user",
+          "content": "Về chủ đề Graph Neural Networks nhé"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 5 bài báo arXiv tốt nhất"
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "Graph Neural Networks",
+              "max_results": 5
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: tổng hợp query ở turn 2 và max_results=5 ở turn 3 để gọi papers"
+      }
+    },
+    {
+      "id": "G07_multiturn_clarify_url_then_paper_text",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Đọc nội dung bài báo arXiv này giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "ID là 2303.08774"
+        },
+        {
+          "role": "user",
+          "content": "Đọc 3 trang đầu thôi nhé"
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "2303.08774",
+              "max_pages": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: nhận arxiv_url từ turn 2 và max_pages=3 từ turn 3 để gọi paper_text"
+      }
+    },
+    {
+      "id": "G08_multiturn_switch_web_to_arxiv",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm trên web thông tin về AI Agent"
+        },
+        {
+          "role": "user",
+          "content": "Thôi bỏ web đi, tìm bài báo chính thức trên arXiv"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn chủ đề AI Agent nhé"
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "AI Agent"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: đổi từ tìm web sang papers (arXiv) giữ nguyên query"
+      }
+    },
+    {
+      "id": "G09_multiturn_format_digest",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm 3 bài báo về Transformer"
+        },
+        {
+          "role": "user",
+          "content": "Tổng hợp các bài báo vừa tìm thành bản tin digest"
+        },
+        {
+          "role": "user",
+          "content": "Dùng template brief nhé"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "template": "brief"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: yêu cầu trình bày bản tin (digest) chọn template=brief"
+      }
+    },
+    {
+      "id": "G10_multiturn_no_tool_meta",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm bài báo arXiv về LLM"
+        },
+        {
+          "role": "user",
+          "content": "Cảm ơn bạn, mình đã đọc xong rồi"
+        },
+        {
+          "role": "user",
+          "content": "Bạn có thể tự viết một bài báo mới cho mình không?"
+        }
+      ],
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "metadata": {
+        "what_it_tests": "Multi-turn: hỏi khả năng meta ở turn cuối -> không gọi tool"
+      }
+    }
+  ]
 }
